@@ -1,0 +1,16 @@
+[project]
+name = "overnight-drift-india"
+version = "0.1.0"
+description = "Night (close->open) vs day (open->close) returns on Indian equities, and whether the split survives Indian trading costs."
+requires-python = ">=3.12"
+
+# Dependencies are not listed here. requirements.in holds the direct ones and
+# requirements.txt is the pinned, hashed lock (see the header of
+# requirements.in). There is deliberately no [build-system]: installing the
+# project itself would pull an unpinned build backend from PyPI.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]

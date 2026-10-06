@@ -1,0 +1,15 @@
+# Direct dependencies only. The pinned, hashed lock is requirements.txt.
+#
+# Supply-chain rule: nothing uploaded to PyPI in the last 7 days, including
+# transitive dependencies. Regenerate the lock with a cutoff 7+ days back:
+#
+#   uv pip compile requirements.in --python 3.12 --generate-hashes \
+#       --only-binary :all: --exclude-newer <YYYY-MM-DD>T00:00:00Z \
+#       -o requirements.txt
+#
+# then run scripts/audit_deps.py to verify upload dates and known CVEs.
+yfinance
+pandas
+numpy
+matplotlib
+pytest
