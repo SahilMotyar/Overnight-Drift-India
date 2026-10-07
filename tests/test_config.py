@@ -21,7 +21,7 @@ def test_subperiods_tile_the_timeline() -> None:
 
 
 def test_data_paths_stay_inside_the_project() -> None:
-    for p in (config.DATA_RAW, config.DATA_CLEAN, config.REPORTS, config.FIGURES):
+    for p in (config.DATA_RAW, config.DATA_CLEAN, config.DATA_UNIVERSE, config.REPORTS, config.FIGURES):
         assert p.is_relative_to(config.ROOT)
         assert p.is_dir()
 

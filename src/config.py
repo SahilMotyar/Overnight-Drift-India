@@ -58,10 +58,11 @@ def rng(stream: str) -> np.random.Generator:
 ROOT = Path(__file__).resolve().parents[1]
 DATA_RAW = ROOT / "data" / "raw"
 DATA_CLEAN = ROOT / "data" / "clean"
+DATA_UNIVERSE = ROOT / "data" / "universe"  # committed, unlike raw/ and clean/
 REPORTS = ROOT / "reports"
 FIGURES = REPORTS / "figures"
 
-for _p in (DATA_RAW, DATA_CLEAN, REPORTS, FIGURES):
+for _p in (DATA_RAW, DATA_CLEAN, DATA_UNIVERSE, REPORTS, FIGURES):
     _p.mkdir(parents=True, exist_ok=True)
 
 # --------------------------------------------------------------------------
@@ -80,8 +81,17 @@ ETFS: dict[str, str] = {
     "NIFTYBEES.NS": "Nippon India ETF Nifty BeES",
 }
 
-# Stocks: the current Nifty 50 constituents, fetched from NSE's official list
-# in Phase 1. Not hard-coded here because the list changes twice a year.
+# Stocks: the Nifty 50 constituents as NSE publishes them, frozen into a
+# committed snapshot the first time Phase 1 runs. Frozen so that a semi-annual
+# index rebalance mid-study cannot silently change the sample; refresh only on
+# purpose (scripts/phase1_acquire.py --refresh-universe).
+NIFTY50_SNAPSHOT = DATA_UNIVERSE / "nifty50.csv"
+
+# Official sources, tried in order. Both serve the same file.
+NIFTY50_LIST_URLS: tuple[str, ...] = (
+    "https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv",
+    "https://www.niftyindices.com/IndexConstituent/ind_nifty50list.csv",
+)
 
 # --------------------------------------------------------------------------
 # Data

@@ -1,0 +1,51 @@
+Company Name,Industry,Symbol,Series,ISIN Code,Ticker,Source,Fetched
+Adani Enterprises Ltd.,Metals & Mining,ADANIENT,EQ,INE423A01024,ADANIENT.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Adani Ports and Special Economic Zone Ltd.,Services,ADANIPORTS,EQ,INE742F01042,ADANIPORTS.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Apollo Hospitals Enterprise Ltd.,Healthcare,APOLLOHOSP,EQ,INE437A01024,APOLLOHOSP.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Asian Paints Ltd.,Consumer Durables,ASIANPAINT,EQ,INE021A01026,ASIANPAINT.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Axis Bank Ltd.,Financial Services,AXISBANK,EQ,INE238A01034,AXISBANK.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+BSE Ltd.,Financial Services,BSE,EQ,INE118H01025,BSE.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Bajaj Auto Ltd.,Automobile and Auto Components,BAJAJ-AUTO,EQ,INE917I01010,BAJAJ-AUTO.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Bajaj Finance Ltd.,Financial Services,BAJFINANCE,EQ,INE296A01032,BAJFINANCE.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Bajaj Finserv Ltd.,Financial Services,BAJAJFINSV,EQ,INE918I01026,BAJAJFINSV.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Bharat Electronics Ltd.,Capital Goods,BEL,EQ,INE263A01024,BEL.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Bharti Airtel Ltd.,Telecommunication,BHARTIARTL,EQ,INE397D01024,BHARTIARTL.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Cipla Ltd.,Healthcare,CIPLA,EQ,INE059A01026,CIPLA.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Coal India Ltd.,Oil Gas & Consumable Fuels,COALINDIA,EQ,INE522F01014,COALINDIA.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Dr. Reddy's Laboratories Ltd.,Healthcare,DRREDDY,EQ,INE089A01031,DRREDDY.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Eicher Motors Ltd.,Automobile and Auto Components,EICHERMOT,EQ,INE066A01021,EICHERMOT.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Eternal Ltd.,Consumer Services,ETERNAL,EQ,INE758T01015,ETERNAL.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Grasim Industries Ltd.,Construction Materials,GRASIM,EQ,INE047A01021,GRASIM.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+HCL Technologies Ltd.,Information Technology,HCLTECH,EQ,INE860A01027,HCLTECH.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+HDFC Bank Ltd.,Financial Services,HDFCBANK,EQ,INE040A01034,HDFCBANK.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+HDFC Life Insurance Company Ltd.,Financial Services,HDFCLIFE,EQ,INE795G01014,HDFCLIFE.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Hindalco Industries Ltd.,Metals & Mining,HINDALCO,EQ,INE038A01020,HINDALCO.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Hindustan Unilever Ltd.,Fast Moving Consumer Goods,HINDUNILVR,EQ,INE030A01027,HINDUNILVR.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+ICICI Bank Ltd.,Financial Services,ICICIBANK,EQ,INE090A01021,ICICIBANK.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+ITC Ltd.,Fast Moving Consumer Goods,ITC,EQ,INE154A01025,ITC.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Infosys Ltd.,Information Technology,INFY,EQ,INE009A01021,INFY.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+InterGlobe Aviation Ltd.,Services,INDIGO,EQ,INE646L01027,INDIGO.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+JSW Steel Ltd.,Metals & Mining,JSWSTEEL,EQ,INE019A01038,JSWSTEEL.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Jio Financial Services Ltd.,Financial Services,JIOFIN,EQ,INE758E01017,JIOFIN.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Kotak Mahindra Bank Ltd.,Financial Services,KOTAKBANK,EQ,INE237A01036,KOTAKBANK.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Larsen & Toubro Ltd.,Construction,LT,EQ,INE018A01030,LT.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Mahindra & Mahindra Ltd.,Automobile and Auto Components,M&M,EQ,INE101A01026,M&M.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Maruti Suzuki India Ltd.,Automobile and Auto Components,MARUTI,EQ,INE585B01010,MARUTI.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Max Healthcare Institute Ltd.,Healthcare,MAXHEALTH,EQ,INE027H01010,MAXHEALTH.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+NTPC Ltd.,Power,NTPC,EQ,INE733E01010,NTPC.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Nestle India Ltd.,Fast Moving Consumer Goods,NESTLEIND,EQ,INE239A01024,NESTLEIND.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Oil & Natural Gas Corporation Ltd.,Oil Gas & Consumable Fuels,ONGC,EQ,INE213A01029,ONGC.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Power Grid Corporation of India Ltd.,Power,POWERGRID,EQ,INE752E01010,POWERGRID.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Reliance Industries Ltd.,Oil Gas & Consumable Fuels,RELIANCE,EQ,INE002A01018,RELIANCE.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+SBI Life Insurance Company Ltd.,Financial Services,SBILIFE,EQ,INE123W01016,SBILIFE.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Shriram Finance Ltd.,Financial Services,SHRIRAMFIN,EQ,INE721A01047,SHRIRAMFIN.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+State Bank of India,Financial Services,SBIN,EQ,INE062A01020,SBIN.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Sun Pharmaceutical Industries Ltd.,Healthcare,SUNPHARMA,EQ,INE044A01036,SUNPHARMA.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Tata Consultancy Services Ltd.,Information Technology,TCS,EQ,INE467B01029,TCS.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Tata Consumer Products Ltd.,Fast Moving Consumer Goods,TATACONSUM,EQ,INE192A01025,TATACONSUM.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Tata Motors Passenger Vehicles Ltd.,Automobile and Auto Components,TMPV,EQ,INE155A01022,TMPV.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Tata Steel Ltd.,Metals & Mining,TATASTEEL,EQ,INE081A01020,TATASTEEL.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Tech Mahindra Ltd.,Information Technology,TECHM,EQ,INE669C01036,TECHM.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Titan Company Ltd.,Consumer Durables,TITAN,EQ,INE280A01028,TITAN.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+Trent Ltd.,Consumer Services,TRENT,EQ,INE849A01020,TRENT.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
+UltraTech Cement Ltd.,Construction Materials,ULTRACEMCO,EQ,INE481G01011,ULTRACEMCO.NS,https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv,2026-10-07T06:11:15Z
