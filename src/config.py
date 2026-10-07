@@ -118,6 +118,29 @@ CALENDAR_TICKERS: tuple[str, ...] = ("^NSEI", "^BSESN")
 # reports the night with and without them, since dividends land in the night).
 
 # --------------------------------------------------------------------------
+# Validation (Phase 2)
+# --------------------------------------------------------------------------
+
+# NSE's capital market segment opened on this date. Yahoo has earlier ".NS"
+# rows (TMPV back to 1991), which cannot be NSE prices.
+NSE_EQUITY_START = "1994-11-03"
+
+# A close-to-close jump beyond this, reversed within GLITCH_MAX_ROWS rows back
+# to the old level, is a scale glitch (typically one row Yahoo forgot to
+# split-adjust, e.g. TATASTEEL +950% then -90% the next day).
+GLITCH_MIN_JUMP = 0.25
+GLITCH_MAX_ROWS = 5
+
+# Overnight moves beyond +-20% in these large caps are corporate actions Yahoo
+# did not adjust (demergers: LT 2004, BAJAJ 2008, TMPV 2025) or bad data. The
+# night is rejected; the rows are kept. Each one is listed for review.
+EXTREME_NIGHT = 0.20
+
+# A night and the following day that both move more than this, in opposite
+# directions, and nearly cancel, point to a bad Open. Both are rejected.
+BAD_OPEN_MIN_JUMP = 0.15
+
+# --------------------------------------------------------------------------
 # Subperiods (Phase 4)
 # --------------------------------------------------------------------------
 
