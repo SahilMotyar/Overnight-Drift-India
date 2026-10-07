@@ -59,10 +59,12 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_RAW = ROOT / "data" / "raw"
 DATA_CLEAN = ROOT / "data" / "clean"
 DATA_UNIVERSE = ROOT / "data" / "universe"  # committed, unlike raw/ and clean/
+DATA_REFERENCE = ROOT / "data" / "reference"  # committed: facts fetched once from NSE
+DATA_NSE = DATA_RAW / "nse"  # NSE archive files, git-ignored like the rest of raw/
 REPORTS = ROOT / "reports"
 FIGURES = REPORTS / "figures"
 
-for _p in (DATA_RAW, DATA_CLEAN, DATA_UNIVERSE, REPORTS, FIGURES):
+for _p in (DATA_RAW, DATA_CLEAN, DATA_UNIVERSE, DATA_REFERENCE, DATA_NSE, REPORTS, FIGURES):
     _p.mkdir(parents=True, exist_ok=True)
 
 # --------------------------------------------------------------------------
@@ -139,6 +141,31 @@ EXTREME_NIGHT = 0.20
 # A night and the following day that both move more than this, in opposite
 # directions, and nearly cancel, point to a bad Open. Both are rejected.
 BAD_OPEN_MIN_JUMP = 0.15
+
+# --------------------------------------------------------------------------
+# Trading calendar (Phase 2)
+# --------------------------------------------------------------------------
+
+# A date is a candidate session if at least this share of the stocks listed at
+# the time have a real row on it.
+CONSENSUS_SHARE = 0.5
+
+# Dates where the stocks are split between these shares, or where consensus
+# and the index calendar disagree, are settled by whether NSE published a
+# bhavcopy that day. Results are cached in NSE_SESSION_CHECKS (committed).
+DISPUTED_SHARE: tuple[float, float] = (0.1, 0.9)
+NSE_SESSION_CHECKS = DATA_REFERENCE / "nse_session_checks.csv"
+NSE_REQUEST_DELAY_SECONDS = 0.5
+
+# Muhurat trading: the one-hour evening session on Diwali. Its "night" and
+# "day" mean something else, so these sessions and the nights around them are
+# kept out of the main series. Listed: only the Diwali dates on which Yahoo has
+# a session, each confirmed by stock volume falling to 9-27% of its trailing
+# 20-session median. Yahoo has no row for other years (e.g. 2023-11-12).
+MUHURAT_SESSIONS: tuple[str, ...] = (
+    "1998-10-19", "2004-11-12", "2017-10-19", "2018-11-07", "2019-10-27",
+    "2020-11-14", "2021-11-04", "2022-10-24", "2024-11-01", "2025-10-21",
+)
 
 # --------------------------------------------------------------------------
 # Subperiods (Phase 4)
