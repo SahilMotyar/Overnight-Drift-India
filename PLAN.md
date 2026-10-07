@@ -54,7 +54,7 @@ explains (a loss stops at zero) goes away.
 |---|---|---|
 | 0 | Scaffold: venv, pinned deps, config, cache | **done** (2026-10-06) |
 | 1 | Acquisition: indices, ETF, Nifty 50 stocks | **done** (2026-10-07; 54/54 series) |
-| 2 | Validation layer + drop table | not started |
+| 2 | Validation layer + drop table | **done** (2026-10-07; 300,863 usable nights) |
 | 3 | Decomposition: the reel's chart on Indian data | not started |
 | 4 | Is it real? Significance, subperiods, cross-section | not started |
 | 5 | Indian cost model + break-even table | not started |
@@ -85,10 +85,16 @@ scripts/audit_deps.py  checks lock: upload dates vs cutoff, hashes, OSV CVEs
 data/raw/          yfinance downloads, one CSV per ticker, git-ignored
 data/clean/        validated frames + night/day columns + session flags
 data/universe/     frozen Nifty 50 list from NSE (committed)
+data/reference/    NSE's verdict on every disputed / closed day (committed)
 src/config.py      tickers, dates, cost parameters, paths
 src/universe.py    fetch + validate + freeze NSE's constituent list
 src/data.py        download, daily cache, dividend adjustment, cache-only load()
 src/coverage.py    Phase 1 coverage table vs a reference calendar
+src/validate.py    Phase 2 row checks, return checks, flags (pure masks)
+src/nse.py         NSE bhavcopy / index-close archive reader, cached
+src/sessions.py    trading calendar, special sessions, night labels
+src/clean.py       Phase 2 pipeline + drop log + start dates
+src/spotcheck.py   cleaned Yahoo returns vs NSE official prices
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -121,54 +127,109 @@ reports/           findings.md + figures
   - `python -m scripts.phase1_acquire`
 
 ### Phase 2: Validation
-Everything here depends on the Open column, which is the least reliable column
-in free data.
+`python -m scripts.phase2_validate`. It reads the Phase 1 cache only, asks NSE
+about disputed days (cached), and writes `data/clean/<ticker>.csv` plus
+`reports/phase2_*.csv`. From 317,503 raw rows it keeps 304,245, with
+**300,863 usable nights** and 303,600 usable days.
 
-1. **Stale opens** (Open == previous Close). These fake a zero night and push the
-   whole move into the day. Pre-check on the cached `^NSEI` in
-   Dynamic-Regime-Allocation (2007-09-17 .. 2026-08-13): 2-8% of days per year
-   in 2007-2010, about 0% from 2011 on. That timing fits NSE's pre-open call
-   auction, which started in late 2010. Treat pre-2011 opens as suspect and
-   decide here whether to drop or keep them.
-2. Open or Close outside [Low, High]; all four OHLC equal; zero or missing
-   volume (stocks).
-3. Missed corporate actions: a stock's overnight move beyond +-20% with no
-   matching news is probably a split or bonus that wasn't adjusted.
-4. **Non-standard sessions:**
-   - Muhurat trading (the one-hour Diwali session). Its "night" and "day" mean
-     something different.
-   - Saturday special sessions (e.g. budget days).
-   - Mock and DR-drill sessions.
+The check that mattered most was **asking NSE**. NSE publishes a bhavcopy
+for every session and only for sessions, and its archive goes back to Nov
+1994. So a disputed day is settled by whether that file exists. Its prices
+also give an independent check of Yahoo's.
 
-   Flag them and keep them out of the main series.
-5. Tag each night by calendar length: weeknight, weekend, or holiday. If the
-   drift is a risk premium, longer nights should carry more of it.
-6. Spot-check about 20 random days per index against NSE's official historical
-   data.
-7. **Found at the Phase 1 checkpoint**, to handle here:
-   - *Placeholder rows on holidays.* Yahoo has rows for stocks and NIFTYBEES on
-     NSE holidays, e.g. 2026-10-02 (Gandhi Jayanti) and 2026-05-01 (Maharashtra
-     Day). On these rows O=H=L=C=previous close and volume is 0, so they fake a
-     zero night and a zero day. That's 6 such dates in 2026 alone, and they
-     probably make up most of the ~116 `extra` rows on the long-history stocks.
-     Drop them, ideally against NSE's own holiday list.
-   - *TMPV.NS (Tata Motors).* Yahoo has 1,001 rows dated before NSE's equity
-     market opened (Nov 1994), starting 1991 with flat zero-volume bars. There
-     is also an unadjusted **-39.5% overnight gap on 2025-10-14**, the demerger
-     of the commercial-vehicle business. Decide: start after the demerger,
-     adjust by the demerger ratio, or exclude the stock.
-   - *Missing last day.* NIFTYBEES and 7 stocks have no 2026-10-06 row
-     (`behind = 1`).
-   - *Index gaps.* ^NSEI is missing 11 trading days, ^BSESN 7, ^NSEBANK 1.
-   - *Unverifiable early rows.* 17 stocks start 1996-01-01, 391 rows before
-     the reference calendar begins (1997-07-01), so those rows can't be checked.
-   - *Special sessions present.* Muhurat 2019-10-27 (Sun) and 2020-11-14
-     (Sat), and Budget day 2025-02-01 (Sat). Of these, ^NSEI only has
-     2025-02-01.
-- CHECKPOINT: drop table (ticker x reason x count) and the chosen start date
-  per series.
+1. **Calendar** (7,651 sessions, 1996-01-01 .. 2026-10-06).
+   - *Candidates.* A date is a candidate if at least 50% of the stocks listed
+     at the time (min. 5) have a real row on it.
+   - *Disputes.* 142 dates were disputed (stocks vs the index calendar, or the
+     stocks split). NSE settled them: 132 sessions, 10 not, e.g. Sensex rows
+     on 2000-01-26, which is Republic Day.
+   - *Hidden sessions.* Every day the calendar treated as closed (2,292 dates)
+     was also put to NSE. **NSE traded on 49 of them, and 48 appear in no Yahoo
+     series at all**:
+     - 16 Muhurat sessions
+     - 28 Saturdays: special sessions in 1997-2014, Budget days (1999-02-27,
+       2015-02-28, 2020-02-01) and the 2024 DR-drill Saturdays
+     - 5 other days (2009-01-01, 2012-10-26, 2012-11-11, 2019-02-13,
+       2019-03-29)
+
+     Without this, the night across each one silently contains a whole
+     trading day.
+   - *Special sessions.* 30 Muhurat sessions (one per Diwali, 1996-2025) and
+     30 weekend sessions.
+2. **Rows removed** (ticker x reason in `reports/phase2_drop_table.csv`):
+   - before the series' start date: 6,079
+   - placeholders (flat at previous close, zero volume; Yahoo's holiday
+     filler): 5,124 across 51 series
+   - before NSE's equity segment opened (TMPV, 1991-94): 1,001
+   - Open/Close outside [Low, High] (all in 1996): 462
+   - flat zero-volume bars: 293
+   - not an NSE session: 289
+   - scale glitches, e.g. TATASTEEL +950% then -90%: 9
+   - price <= 0: 1
+3. **Nights rejected:**
+   - spans a session the series lacks: 2,063
+   - special session at either end: 1,203
+   - first row: 54
+   - stale index open: 43 (indices only)
+   - beyond +-20%: 19
+
+   Days rejected: special session 602, stale index open 43.
+4. **Stale opens.** Indices: an error, so rejected. Stocks: **real**. NSE's
+   official OPEN equals PREVCLOSE on these days (23/23 sampled), and they make
+   up 4.0% of all usable stock nights, so they stay in. Dropping them would
+   bias the night upward.
+5. **Reversed opens** (night and day both beyond 15%, opposite directions,
+   nearly cancelling). These were first rejected as "bad opens". NSE shows the
+   same open on 60 of the 61 it could check (e.g. NIFTYBEES opened -19.5% on
+   2016-11-29 and recovered +24.5% the same day). They are freak opening
+   prints, not data errors, so they are **flagged** (`reversed_open`, 98
+   rows), not rejected.
+6. **Nights beyond +-20%** (`reports/phase2_unusual_vs_nse.csv`). All 19 are
+   rejected, because a corporate action can't be told apart from a real move
+   without a corporate-action database. Against NSE:
+   - Yahoo artifacts (3): ADANIENT 2015-06-03 (+220%), RELIANCE 1997-10-27,
+     TRENT 2026-01-01.
+   - Corporate actions, with NSE's PREVCLOSE unadjusted too (2): RELIANCE
+     1997-11-05 (bonus), TMPV 2025-10-14 (demerger).
+   - **Genuine price moves (7):** EICHERMOT x5 (1998-2001), ONGC 2002-05-06,
+     NESTLEIND 2010-04-23. See open decisions.
+   - Not checkable (7).
+7. **Start dates** (`reports/phase2_series.csv`). A series starts after its
+   last 250-session window with under 90% coverage. Coverage is counted only
+   against sessions at least one Yahoo series has; otherwise the hidden
+   sessions drag every start past them. Results:
+   - NESTLEIND starts 2010-02-08, after 7 years of placeholders.
+   - NIFTYBEES starts 2013-06-24, after the 2012-13 no-trade spell.
+   - Most 1996 starts move to mid-1996.
+   - Four "not before" overrides, each backed by a jump in the data: TCS
+     2004-08-25 (IPO), ULTRACEMCO 2004-08-24, BAJAJ-AUTO and BAJAJFINSV
+     2008-05-26 (demerger).
+8. **Night labels.** Every row gets a `night_kind` (weeknight / weekend /
+   holiday / gap / first) and `night_days`, its calendar length.
+9. **Spot-check vs NSE** (`reports/phase2_spotcheck.csv`): 40 random sessions,
+   1998-2026.
+   - *Accepted returns match NSE to within 0.2%:* stocks 1,309 nights / 1,351
+     days, indices 36 / 38 (from 2012; the archive has no earlier files), ETF
+     15 / 15, all 100%. 152 stock lookups failed because of old symbols or
+     ISINs.
+   - *Close.* **Yahoo's Close is NSE's official close** (the 30-minute VWAP),
+     not the last trade, on all 554 days where those two differ.
+   - *The first draw*, made before the hidden-session fix, matched 98.0%.
+     Its 27 mismatches: 20 nights across hidden Saturdays (since fixed), 2
+     where NSE's own PREVCLOSE ignores a bonus (KOTAKBANK 2015-07-08, NTPC
+     2019-03-19), and 5 genuine Yahoo errors (wrong closes on 2019-03-18,
+     BAJAJFINSV 2012-09-06). So expect roughly **0.4% of nights carrying
+     undetected Yahoo errors**.
+- TMPV: only the demerger night is rejected, so the history is kept from
+  1996-06-05. This replaces "start after the demerger", which would have kept
+  one year.
+- CHECKPOINT: done. Drop table, start dates, spot-check, reviewed rejections.
 
 ### Phase 3: Decomposition
+From Phase 2: read `data/clean/` only. A night counts only where `night_ok`,
+and a day only where `day_ok`. Report the main numbers with and without
+`reversed_open` days. Real zero nights (official Open = previous close, 4.0%
+of stock nights) stay in.
 - Build the night, day and hold series per instrument. A test asserts the
   identity holds to 1e-10 on every day.
 - Figures:
@@ -292,7 +353,12 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 
 ## Open decisions (default in bold)
 
-- *(none open)*
+1. **The 7 genuine +-20% nights** (EICHERMOT x5 1998-2001, ONGC 2002-05-06,
+   NESTLEIND 2010-04-23). NSE confirms each as a real price move, but the +-20%
+   rule rejects them along with the corporate actions. For EICHERMOT alone,
+   rejecting them lowers the mean night by about 1.4 bp. Options:
+   **keep them rejected and report the sensitivity in Phase 3**, or reinstate
+   these 7 by name.
 
 ## Decisions logged as they are made
 
@@ -328,3 +394,19 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
     checkable), `missing`, `extra` and `behind` against it.
   - Data runs 1991-01-02 (TMPV) / 1996-01-01 (17 stocks) .. 2026-10-06.
     No ticker failed to download, and no series has duplicate dates.
+- **Phase 2 (2026-10-07).**
+  - NSE's archive is the arbiter for trading days: bhavcopy exists = session.
+    2,424 verdicts (181 sessions) are committed in
+    `data/reference/nse_session_checks.csv`, so the calendar rebuilds offline.
+    The closed-day scan took about an hour at 0.5 s per request.
+    `src/nse.py` retries dropped connections, timeouts and 5xx after NSE reset
+    a connection mid-scan; a 404 is an answer and is never retried.
+  - Stock stale opens are kept (NSE-confirmed); index stale opens are rejected.
+  - "Bad open" was downgraded from a rejection to the `reversed_open` flag
+    after NSE confirmed 60/61 of them.
+  - TMPV: the demerger night is rejected and the history is kept
+    (1996-06-05 on), instead of starting after the demerger.
+  - Muhurat list extended to all 30 Diwalis 1996-2025, each confirmed by
+    Yahoo volume (9-40% of normal) or an NSE file on a holiday.
+  - Start-date coverage ignores sessions no Yahoo series has. Without this,
+    LT jumped to 2004-10-11 and JSWSTEEL to 2005-11-28.

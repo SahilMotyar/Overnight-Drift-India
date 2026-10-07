@@ -95,6 +95,39 @@ def test_stale_open_rejected_for_indices_only() -> None:
     assert stock.loc[CAL[2], "night_ok"] and stock.loc[CAL[2], "day_ok"]
 
 
+def test_reversed_open_is_flagged_not_rejected() -> None:
+    raw = _raw(CAL[:4], close=[100.0, 100.0, 100.0, 100.0])
+    raw.loc[CAL[2], ["Open", "Low"]] = [80.0, 79.0]      # opens -20%, closes back at 100
+    out, summary = clean.finish(raw, "X.NS", False, CAL, KINDS, clean.DropLog())
+    assert out.loc[CAL[2], "reversed_open"]
+    assert out.loc[CAL[2], "night_ok"] and out.loc[CAL[2], "day_ok"]
+    assert summary["reversed_opens"] == 1
+
+
+def test_closed_days_include_saturdays_and_diwali_sundays() -> None:
+    cal = pd.bdate_range("2026-10-01", "2026-11-03").drop(pd.Timestamp("2026-10-02"))
+    got = sessions.closed_days_to_check(cal)
+    assert pd.Timestamp("2026-10-02") in got           # weekday holiday
+    assert pd.Timestamp("2026-10-03") in got           # Saturday
+    assert pd.Timestamp("2026-10-04") in got           # Sunday in October
+    assert pd.DatetimeIndex(got).isin(cal).sum() == 0
+
+
+def test_sessions_no_series_has_do_not_move_the_start() -> None:
+    # 30 sessions NSE traded but Yahoo has nothing for: enough to sink a
+    # 250-session coverage window if they were counted against the series.
+    cal = pd.bdate_range("2020-01-06", periods=400)
+    hidden = cal[100:130]
+    observed = cal.drop(hidden)
+    rows = _raw(observed)
+    kinds = sessions.session_kinds(cal, muhurat=())
+    _, naive = clean.finish(rows, "X.NS", False, cal, kinds, clean.DropLog())
+    out, fixed = clean.finish(rows, "X.NS", False, cal, kinds, clean.DropLog(), coverage_calendar=observed)
+    assert naive["start"] == cal[130].date()
+    assert fixed["start"] == cal[0].date()
+    assert out.loc[cal[130], "night_kind"] == "gap"  # the night across them is still rejected
+
+
 def test_start_override_is_a_floor(monkeypatch) -> None:
     monkeypatch.setitem(config.START_OVERRIDES, "X.NS", (str(CAL[5].date()), "test"))
     out, summary = clean.finish(_raw(CAL), "X.NS", False, CAL, KINDS, clean.DropLog())

@@ -12,6 +12,8 @@ Two kinds of check:
   missing session.
 * **return checks**: the prices stay, but the row's night and/or day return
   is marked unusable.
+* **flags**: nothing is wrong with the data, but the row is unusual enough
+  that later phases should be able to leave it out (:func:`reversed_open`).
 
 All checks run on Yahoo's raw (split-adjusted, not dividend-adjusted) prices,
 so a placeholder row still equals the previous close exactly.
@@ -134,8 +136,14 @@ def extreme_night(df: pd.DataFrame, limit: float = config.EXTREME_NIGHT) -> pd.S
     return night.abs() > limit
 
 
-def bad_open(df: pd.DataFrame, min_jump: float = config.BAD_OPEN_MIN_JUMP) -> pd.Series:
-    """Night and day both large, opposite, and nearly cancelling: the Open is wrong."""
+def reversed_open(df: pd.DataFrame, min_jump: float = config.REVERSED_OPEN_MIN_JUMP) -> pd.Series:
+    """Night and day both large, opposite, and nearly cancelling: a freak opening print.
+
+    Not a data error. NSE's own bhavcopy has the same OPEN on 64 of the 66 such
+    rows it could check (e.g. NIFTYBEES opened -19.5% on 2016-11-29 and closed
+    +24.5% from there). It is the official open, so it is flagged, not
+    rejected; later phases report results with and without these days.
+    """
     n = np.log(df["Open"] / df["Close"].shift(1))
     d = np.log(df["Close"] / df["Open"])
     jump = np.log1p(min_jump)

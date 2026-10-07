@@ -10,6 +10,8 @@ data and settled against NSE:
 2. **Disputes.** Where consensus and the index calendar disagree, or the
    stocks are split, NSE decides: a session if and only if it published a
    bhavcopy that day (:func:`src.nse.verify_sessions`).
+3. **Closed days.** Every day the result treats as closed is also put to NSE
+   (:func:`closed_days_to_check`), to find sessions no Yahoo series has.
 
 Then every row's night is labelled by what it spans. A night that spans a
 session the series has no row for covers a whole trading day as well, so it
@@ -75,6 +77,19 @@ def build_calendar(
     sessions |= set(verified.index[verified])
     sessions -= set(verified.index[~verified])
     return pd.DatetimeIndex(sorted(sessions), name="Date")
+
+
+def closed_days_to_check(calendar: pd.DatetimeIndex) -> pd.DatetimeIndex:
+    """Days inside the calendar's span that it treats as closed and NSE might not have.
+
+    A session no Yahoo series has (NSE traded Saturday 1998-11-28 and
+    1999-04-17) is invisible to consensus, and the night across it silently
+    contains a whole trading day. So every closed weekday and Saturday is put
+    to NSE, plus Sundays in October/November (Diwali Muhurat sessions).
+    """
+    span = pd.date_range(calendar[0], calendar[-1])
+    closed = span.difference(calendar)
+    return closed[(closed.dayofweek <= 5) | ((closed.dayofweek == 6) & closed.month.isin([10, 11]))]
 
 
 def session_kinds(

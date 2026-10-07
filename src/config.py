@@ -28,6 +28,7 @@ _ROOT_SEQ = np.random.SeedSequence(SEED)
 _STREAMS: tuple[str, ...] = (
     "bootstrap",
     "test",
+    "spotcheck",
 )
 
 _STREAM_SEQS = dict(zip(_STREAMS, _ROOT_SEQ.spawn(len(_STREAMS))))
@@ -139,8 +140,9 @@ GLITCH_MAX_ROWS = 5
 EXTREME_NIGHT = 0.20
 
 # A night and the following day that both move more than this, in opposite
-# directions, and nearly cancel, point to a bad Open. Both are rejected.
-BAD_OPEN_MIN_JUMP = 0.15
+# directions, and nearly cancel: a freak opening print. NSE confirms almost
+# all of them (64 of 66 checked), so they are flagged, not rejected.
+REVERSED_OPEN_MIN_JUMP = 0.15
 
 # A series starts after its last COVERAGE_WINDOW-session stretch with rows on
 # fewer than MIN_COVERAGE of sessions. Catches NESTLEIND's 2003-09 placeholder
@@ -174,15 +176,28 @@ DISPUTED_SHARE: tuple[float, float] = (0.1, 0.9)
 NSE_SESSION_CHECKS = DATA_REFERENCE / "nse_session_checks.csv"
 NSE_REQUEST_DELAY_SECONDS = 0.5
 
-# Muhurat trading: the one-hour evening session on Diwali. Its "night" and
-# "day" mean something else, so these sessions and the nights around them are
-# kept out of the main series. Listed: only the Diwali dates on which Yahoo has
-# a session, each confirmed by stock volume falling to 9-27% of its trailing
-# 20-session median. Yahoo has no row for other years (e.g. 2023-11-12).
+# Muhurat trading: the short evening session on Diwali. Its "night" and "day"
+# mean something else, so these sessions and the nights around them are kept
+# out of the main series. One per year, 1996-2025, each confirmed one of two
+# ways: stock volume on Yahoo collapses to 9-40% of its trailing 20-session
+# median, or (16 dates Yahoo has no row for at all) NSE published a bhavcopy
+# on what is otherwise a holiday (data/reference/nse_session_checks.csv).
 MUHURAT_SESSIONS: tuple[str, ...] = (
-    "1998-10-19", "2004-11-12", "2017-10-19", "2018-11-07", "2019-10-27",
-    "2020-11-14", "2021-11-04", "2022-10-24", "2024-11-01", "2025-10-21",
+    "1996-11-10", "1997-10-30", "1998-10-19", "1999-11-07", "2000-10-26",
+    "2001-11-14", "2002-11-04", "2003-10-25", "2004-11-12", "2005-11-01",
+    "2006-10-21", "2007-11-09", "2008-10-28", "2009-10-17", "2010-11-05",
+    "2011-10-26", "2012-11-13", "2013-11-03", "2014-10-23", "2015-11-11",
+    "2016-10-30", "2017-10-19", "2018-11-07", "2019-10-27", "2020-11-14",
+    "2021-11-04", "2022-10-24", "2023-11-12", "2024-11-01", "2025-10-21",
 )
+
+# Spot-check of cleaned Yahoo returns against NSE's official prices, on
+# randomly drawn regular sessions. Index files exist from 2012, so about half
+# the draws also check ^NSEI and ^NSEBANK. A return matches if its log
+# differs from NSE's by less than the tolerance (~2 ticks of 0.05 at Rs 50).
+SPOTCHECK_SESSIONS = 40
+SPOTCHECK_FROM = "1996-01-01"
+SPOTCHECK_TOLERANCE = 0.002
 
 # --------------------------------------------------------------------------
 # Subperiods (Phase 4)

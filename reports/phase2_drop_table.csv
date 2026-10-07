@@ -1,0 +1,362 @@
+ticker,stage,reason,count
+NIFTYBEES.NS,row,price <= 0,1
+NIFTYBEES.NS,row,"placeholder: flat at previous close, no volume",8
+NIFTYBEES.NS,row,"no trades: flat bar, zero volume",172
+ADANIENT.NS,row,"placeholder: flat at previous close, no volume",37
+ADANIENT.NS,row,"no trades: flat bar, zero volume",3
+ADANIPORTS.NS,row,"placeholder: flat at previous close, no volume",16
+APOLLOHOSP.NS,row,"placeholder: flat at previous close, no volume",36
+APOLLOHOSP.NS,row,"no trades: flat bar, zero volume",2
+ASIANPAINT.NS,row,"placeholder: flat at previous close, no volume",36
+ASIANPAINT.NS,row,"no trades: flat bar, zero volume",2
+AXISBANK.NS,row,"placeholder: flat at previous close, no volume",82
+BSE.NS,row,"placeholder: flat at previous close, no volume",7
+BAJAJ-AUTO.NS,row,"placeholder: flat at previous close, no volume",91
+BAJFINANCE.NS,row,"placeholder: flat at previous close, no volume",37
+BAJFINANCE.NS,row,"no trades: flat bar, zero volume",3
+BAJAJFINSV.NS,row,"placeholder: flat at previous close, no volume",76
+BEL.NS,row,"placeholder: flat at previous close, no volume",35
+BEL.NS,row,"no trades: flat bar, zero volume",3
+BHARTIARTL.NS,row,"placeholder: flat at previous close, no volume",35
+BHARTIARTL.NS,row,"no trades: flat bar, zero volume",3
+CIPLA.NS,row,"Open/Close outside [Low, High]",41
+CIPLA.NS,row,"placeholder: flat at previous close, no volume",119
+CIPLA.NS,row,"no trades: flat bar, zero volume",5
+COALINDIA.NS,row,"placeholder: flat at previous close, no volume",9
+DRREDDY.NS,row,"Open/Close outside [Low, High]",37
+DRREDDY.NS,row,"placeholder: flat at previous close, no volume",121
+DRREDDY.NS,row,"no trades: flat bar, zero volume",1
+EICHERMOT.NS,row,"Open/Close outside [Low, High]",30
+EICHERMOT.NS,row,"placeholder: flat at previous close, no volume",129
+EICHERMOT.NS,row,"no trades: flat bar, zero volume",3
+ETERNAL.NS,row,"placeholder: flat at previous close, no volume",10
+GRASIM.NS,row,"placeholder: flat at previous close, no volume",34
+GRASIM.NS,row,"no trades: flat bar, zero volume",3
+HCLTECH.NS,row,"placeholder: flat at previous close, no volume",17
+HCLTECH.NS,row,"no trades: flat bar, zero volume",13
+HDFCBANK.NS,row,"Open/Close outside [Low, High]",28
+HDFCBANK.NS,row,"placeholder: flat at previous close, no volume",122
+HDFCBANK.NS,row,"no trades: flat bar, zero volume",3
+HDFCLIFE.NS,row,"placeholder: flat at previous close, no volume",7
+HINDALCO.NS,row,"Open/Close outside [Low, High]",31
+HINDALCO.NS,row,"placeholder: flat at previous close, no volume",124
+HINDALCO.NS,row,"no trades: flat bar, zero volume",1
+HINDUNILVR.NS,row,"Open/Close outside [Low, High]",28
+HINDUNILVR.NS,row,"placeholder: flat at previous close, no volume",124
+HINDUNILVR.NS,row,"no trades: flat bar, zero volume",1
+ICICIBANK.NS,row,"placeholder: flat at previous close, no volume",35
+ICICIBANK.NS,row,"no trades: flat bar, zero volume",3
+ITC.NS,row,"Open/Close outside [Low, High]",17
+ITC.NS,row,"placeholder: flat at previous close, no volume",117
+ITC.NS,row,"no trades: flat bar, zero volume",4
+INFY.NS,row,"Open/Close outside [Low, High]",40
+INFY.NS,row,"placeholder: flat at previous close, no volume",124
+INFY.NS,row,"no trades: flat bar, zero volume",3
+INDIGO.NS,row,"placeholder: flat at previous close, no volume",6
+JSWSTEEL.NS,row,"placeholder: flat at previous close, no volume",61
+JIOFIN.NS,row,"placeholder: flat at previous close, no volume",8
+KOTAKBANK.NS,row,"placeholder: flat at previous close, no volume",48
+KOTAKBANK.NS,row,"no trades: flat bar, zero volume",3
+LT.NS,row,"placeholder: flat at previous close, no volume",63
+M&M.NS,row,"Open/Close outside [Low, High]",34
+M&M.NS,row,"placeholder: flat at previous close, no volume",109
+M&M.NS,row,"no trades: flat bar, zero volume",15
+MARUTI.NS,row,"placeholder: flat at previous close, no volume",32
+MAXHEALTH.NS,row,"placeholder: flat at previous close, no volume",7
+NTPC.NS,row,"placeholder: flat at previous close, no volume",16
+NESTLEIND.NS,row,"placeholder: flat at previous close, no volume",1722
+NESTLEIND.NS,row,"no trades: flat bar, zero volume",1
+ONGC.NS,row,"Open/Close outside [Low, High]",26
+ONGC.NS,row,"placeholder: flat at previous close, no volume",108
+ONGC.NS,row,"no trades: flat bar, zero volume",15
+POWERGRID.NS,row,"placeholder: flat at previous close, no volume",12
+RELIANCE.NS,row,"placeholder: flat at previous close, no volume",119
+RELIANCE.NS,row,"no trades: flat bar, zero volume",3
+SBILIFE.NS,row,"placeholder: flat at previous close, no volume",7
+SHRIRAMFIN.NS,row,"placeholder: flat at previous close, no volume",49
+SBIN.NS,row,"Open/Close outside [Low, High]",1
+SBIN.NS,row,"placeholder: flat at previous close, no volume",123
+SUNPHARMA.NS,row,"Open/Close outside [Low, High]",40
+SUNPHARMA.NS,row,"placeholder: flat at previous close, no volume",126
+TCS.NS,row,"placeholder: flat at previous close, no volume",314
+TCS.NS,row,"no trades: flat bar, zero volume",3
+TATACONSUM.NS,row,"Open/Close outside [Low, High]",43
+TATACONSUM.NS,row,"placeholder: flat at previous close, no volume",120
+TATACONSUM.NS,row,"no trades: flat bar, zero volume",2
+TMPV.NS,row,before NSE's equity segment opened (1994-11-03),1001
+TMPV.NS,row,"Open/Close outside [Low, High]",29
+TMPV.NS,row,"placeholder: flat at previous close, no volume",161
+TMPV.NS,row,"no trades: flat bar, zero volume",1
+TATASTEEL.NS,row,"placeholder: flat at previous close, no volume",110
+TATASTEEL.NS,row,"no trades: flat bar, zero volume",15
+TECHM.NS,row,"placeholder: flat at previous close, no volume",12
+TITAN.NS,row,"Open/Close outside [Low, High]",37
+TITAN.NS,row,"placeholder: flat at previous close, no volume",124
+TITAN.NS,row,"no trades: flat bar, zero volume",2
+TRENT.NS,row,"placeholder: flat at previous close, no volume",36
+TRENT.NS,row,"no trades: flat bar, zero volume",3
+ULTRACEMCO.NS,row,"placeholder: flat at previous close, no volume",43
+ULTRACEMCO.NS,row,"no trades: flat bar, zero volume",2
+^NSEI,night,first row: no previous close,1
+^NSEI,night,spans a session the series lacks,46
+^NSEI,night,special session at either end,14
+^NSEI,day,special session (Muhurat / weekend),7
+^NSEI,night,stale index open (= previous close),22
+^NSEI,day,stale index open (= previous close),22
+^BSESN,row,not an NSE session,10
+^BSESN,night,first row: no previous close,1
+^BSESN,night,spans a session the series lacks,78
+^BSESN,night,special session at either end,21
+^BSESN,day,special session (Muhurat / weekend),11
+^BSESN,night,stale index open (= previous close),19
+^BSESN,day,stale index open (= previous close),19
+^NSEBANK,night,first row: no previous close,1
+^NSEBANK,night,spans a session the series lacks,31
+^NSEBANK,night,special session at either end,12
+^NSEBANK,day,special session (Muhurat / weekend),6
+^NSEBANK,night,stale index open (= previous close),2
+^NSEBANK,day,stale index open (= previous close),2
+NIFTYBEES.NS,row,before series start date,931
+NIFTYBEES.NS,row,scale glitch: jump that reverts within 5 rows,2
+NIFTYBEES.NS,night,first row: no previous close,1
+NIFTYBEES.NS,night,spans a session the series lacks,18
+NIFTYBEES.NS,night,special session at either end,16
+NIFTYBEES.NS,day,special session (Muhurat / weekend),8
+ADANIENT.NS,night,first row: no previous close,1
+ADANIENT.NS,night,spans a session the series lacks,39
+ADANIENT.NS,night,special session at either end,22
+ADANIENT.NS,day,special session (Muhurat / weekend),11
+ADANIENT.NS,night,night beyond +-20%,1
+ADANIPORTS.NS,night,first row: no previous close,1
+ADANIPORTS.NS,night,spans a session the series lacks,32
+ADANIPORTS.NS,night,special session at either end,18
+ADANIPORTS.NS,day,special session (Muhurat / weekend),9
+APOLLOHOSP.NS,night,first row: no previous close,1
+APOLLOHOSP.NS,night,spans a session the series lacks,39
+APOLLOHOSP.NS,night,special session at either end,22
+APOLLOHOSP.NS,day,special session (Muhurat / weekend),11
+ASIANPAINT.NS,night,first row: no previous close,1
+ASIANPAINT.NS,night,spans a session the series lacks,39
+ASIANPAINT.NS,night,special session at either end,22
+ASIANPAINT.NS,day,special session (Muhurat / weekend),11
+AXISBANK.NS,night,first row: no previous close,1
+AXISBANK.NS,night,spans a session the series lacks,50
+AXISBANK.NS,night,special session at either end,26
+AXISBANK.NS,day,special session (Muhurat / weekend),13
+AXISBANK.NS,night,night beyond +-20%,2
+BSE.NS,night,first row: no previous close,1
+BSE.NS,night,spans a session the series lacks,8
+BSE.NS,night,special session at either end,18
+BSE.NS,day,special session (Muhurat / weekend),9
+BAJAJ-AUTO.NS,row,before series start date,1541
+BAJAJ-AUTO.NS,night,first row: no previous close,1
+BAJAJ-AUTO.NS,night,spans a session the series lacks,28
+BAJAJ-AUTO.NS,night,special session at either end,18
+BAJAJ-AUTO.NS,day,special session (Muhurat / weekend),9
+BAJFINANCE.NS,night,first row: no previous close,1
+BAJFINANCE.NS,night,spans a session the series lacks,41
+BAJFINANCE.NS,night,special session at either end,22
+BAJFINANCE.NS,day,special session (Muhurat / weekend),11
+BAJAJFINSV.NS,row,before series start date,1401
+BAJAJFINSV.NS,night,first row: no previous close,1
+BAJAJFINSV.NS,night,spans a session the series lacks,30
+BAJAJFINSV.NS,night,special session at either end,18
+BAJAJFINSV.NS,day,special session (Muhurat / weekend),9
+BEL.NS,night,first row: no previous close,1
+BEL.NS,night,spans a session the series lacks,39
+BEL.NS,night,special session at either end,22
+BEL.NS,day,special session (Muhurat / weekend),11
+BHARTIARTL.NS,night,first row: no previous close,1
+BHARTIARTL.NS,night,spans a session the series lacks,39
+BHARTIARTL.NS,night,special session at either end,22
+BHARTIARTL.NS,day,special session (Muhurat / weekend),11
+CIPLA.NS,row,before series start date,65
+CIPLA.NS,row,scale glitch: jump that reverts within 5 rows,1
+CIPLA.NS,night,first row: no previous close,1
+CIPLA.NS,night,spans a session the series lacks,51
+CIPLA.NS,night,special session at either end,30
+CIPLA.NS,day,special session (Muhurat / weekend),15
+COALINDIA.NS,night,first row: no previous close,1
+COALINDIA.NS,night,spans a session the series lacks,24
+COALINDIA.NS,night,special session at either end,18
+COALINDIA.NS,day,special session (Muhurat / weekend),9
+DRREDDY.NS,row,before series start date,235
+DRREDDY.NS,row,scale glitch: jump that reverts within 5 rows,3
+DRREDDY.NS,night,first row: no previous close,1
+DRREDDY.NS,night,spans a session the series lacks,50
+DRREDDY.NS,night,special session at either end,30
+DRREDDY.NS,day,special session (Muhurat / weekend),15
+EICHERMOT.NS,row,before series start date,260
+EICHERMOT.NS,row,scale glitch: jump that reverts within 5 rows,1
+EICHERMOT.NS,night,first row: no previous close,1
+EICHERMOT.NS,night,spans a session the series lacks,57
+EICHERMOT.NS,night,special session at either end,28
+EICHERMOT.NS,day,special session (Muhurat / weekend),14
+EICHERMOT.NS,night,night beyond +-20%,5
+ETERNAL.NS,night,first row: no previous close,1
+ETERNAL.NS,night,spans a session the series lacks,7
+ETERNAL.NS,night,special session at either end,10
+ETERNAL.NS,day,special session (Muhurat / weekend),5
+GRASIM.NS,night,first row: no previous close,1
+GRASIM.NS,night,spans a session the series lacks,39
+GRASIM.NS,night,special session at either end,22
+GRASIM.NS,day,special session (Muhurat / weekend),11
+HCLTECH.NS,row,not an NSE session,14
+HCLTECH.NS,night,first row: no previous close,1
+HCLTECH.NS,night,spans a session the series lacks,39
+HCLTECH.NS,night,special session at either end,24
+HCLTECH.NS,day,special session (Muhurat / weekend),12
+HDFCBANK.NS,row,before series start date,75
+HDFCBANK.NS,row,scale glitch: jump that reverts within 5 rows,1
+HDFCBANK.NS,night,first row: no previous close,1
+HDFCBANK.NS,night,spans a session the series lacks,51
+HDFCBANK.NS,night,special session at either end,30
+HDFCBANK.NS,day,special session (Muhurat / weekend),15
+HDFCLIFE.NS,night,first row: no previous close,1
+HDFCLIFE.NS,night,spans a session the series lacks,8
+HDFCLIFE.NS,night,special session at either end,16
+HDFCLIFE.NS,day,special session (Muhurat / weekend),8
+HINDALCO.NS,row,before series start date,76
+HINDALCO.NS,night,first row: no previous close,1
+HINDALCO.NS,night,spans a session the series lacks,50
+HINDALCO.NS,night,special session at either end,30
+HINDALCO.NS,day,special session (Muhurat / weekend),15
+HINDALCO.NS,night,night beyond +-20%,1
+HINDUNILVR.NS,row,before series start date,79
+HINDUNILVR.NS,night,first row: no previous close,1
+HINDUNILVR.NS,night,spans a session the series lacks,50
+HINDUNILVR.NS,night,special session at either end,30
+HINDUNILVR.NS,day,special session (Muhurat / weekend),15
+ICICIBANK.NS,night,first row: no previous close,1
+ICICIBANK.NS,night,spans a session the series lacks,39
+ICICIBANK.NS,night,special session at either end,22
+ICICIBANK.NS,day,special session (Muhurat / weekend),11
+ITC.NS,night,first row: no previous close,1
+ITC.NS,night,spans a session the series lacks,61
+ITC.NS,night,special session at either end,30
+ITC.NS,day,special session (Muhurat / weekend),15
+INFY.NS,row,before series start date,96
+INFY.NS,night,first row: no previous close,1
+INFY.NS,night,spans a session the series lacks,50
+INFY.NS,night,special session at either end,30
+INFY.NS,day,special session (Muhurat / weekend),15
+INDIGO.NS,night,first row: no previous close,1
+INDIGO.NS,night,spans a session the series lacks,10
+INDIGO.NS,night,special session at either end,18
+INDIGO.NS,day,special session (Muhurat / weekend),9
+JSWSTEEL.NS,night,first row: no previous close,1
+JSWSTEEL.NS,night,spans a session the series lacks,50
+JSWSTEEL.NS,night,special session at either end,14
+JSWSTEEL.NS,day,special session (Muhurat / weekend),7
+JIOFIN.NS,night,first row: no previous close,1
+JIOFIN.NS,night,spans a session the series lacks,6
+JIOFIN.NS,night,special session at either end,6
+JIOFIN.NS,day,special session (Muhurat / weekend),3
+KOTAKBANK.NS,night,first row: no previous close,1
+KOTAKBANK.NS,night,spans a session the series lacks,39
+KOTAKBANK.NS,night,special session at either end,24
+KOTAKBANK.NS,day,special session (Muhurat / weekend),12
+KOTAKBANK.NS,night,night beyond +-20%,1
+LT.NS,row,scale glitch: jump that reverts within 5 rows,1
+LT.NS,night,first row: no previous close,1
+LT.NS,night,spans a session the series lacks,41
+LT.NS,night,special session at either end,22
+LT.NS,day,special session (Muhurat / weekend),11
+LT.NS,night,night beyond +-20%,1
+M&M.NS,row,before series start date,66
+M&M.NS,night,first row: no previous close,1
+M&M.NS,night,spans a session the series lacks,51
+M&M.NS,night,special session at either end,30
+M&M.NS,day,special session (Muhurat / weekend),15
+MARUTI.NS,night,first row: no previous close,1
+MARUTI.NS,night,spans a session the series lacks,42
+MARUTI.NS,night,special session at either end,20
+MARUTI.NS,day,special session (Muhurat / weekend),10
+MAXHEALTH.NS,night,first row: no previous close,1
+MAXHEALTH.NS,night,spans a session the series lacks,5
+MAXHEALTH.NS,night,special session at either end,12
+MAXHEALTH.NS,day,special session (Muhurat / weekend),6
+NTPC.NS,night,first row: no previous close,1
+NTPC.NS,night,spans a session the series lacks,34
+NTPC.NS,night,special session at either end,20
+NTPC.NS,day,special session (Muhurat / weekend),10
+NESTLEIND.NS,row,before series start date,168
+NESTLEIND.NS,night,first row: no previous close,1
+NESTLEIND.NS,night,spans a session the series lacks,24
+NESTLEIND.NS,night,special session at either end,18
+NESTLEIND.NS,day,special session (Muhurat / weekend),9
+NESTLEIND.NS,night,night beyond +-20%,1
+ONGC.NS,row,before series start date,75
+ONGC.NS,night,first row: no previous close,1
+ONGC.NS,night,spans a session the series lacks,51
+ONGC.NS,night,special session at either end,30
+ONGC.NS,day,special session (Muhurat / weekend),15
+ONGC.NS,night,night beyond +-20%,1
+POWERGRID.NS,night,first row: no previous close,1
+POWERGRID.NS,night,spans a session the series lacks,29
+POWERGRID.NS,night,special session at either end,18
+POWERGRID.NS,day,special session (Muhurat / weekend),9
+RELIANCE.NS,night,first row: no previous close,1
+RELIANCE.NS,night,spans a session the series lacks,50
+RELIANCE.NS,night,special session at either end,30
+RELIANCE.NS,day,special session (Muhurat / weekend),15
+RELIANCE.NS,night,night beyond +-20%,2
+SBILIFE.NS,night,first row: no previous close,1
+SBILIFE.NS,night,spans a session the series lacks,8
+SBILIFE.NS,night,special session at either end,18
+SBILIFE.NS,day,special session (Muhurat / weekend),9
+SHRIRAMFIN.NS,night,first row: no previous close,1
+SHRIRAMFIN.NS,night,spans a session the series lacks,47
+SHRIRAMFIN.NS,night,special session at either end,22
+SHRIRAMFIN.NS,day,special session (Muhurat / weekend),11
+SHRIRAMFIN.NS,night,night beyond +-20%,1
+SBIN.NS,night,first row: no previous close,1
+SBIN.NS,night,spans a session the series lacks,51
+SBIN.NS,night,special session at either end,30
+SBIN.NS,day,special session (Muhurat / weekend),15
+SUNPHARMA.NS,row,before series start date,67
+SUNPHARMA.NS,night,first row: no previous close,1
+SUNPHARMA.NS,night,spans a session the series lacks,51
+SUNPHARMA.NS,night,special session at either end,28
+SUNPHARMA.NS,day,special session (Muhurat / weekend),14
+TCS.NS,row,before series start date,231
+TCS.NS,night,first row: no previous close,1
+TCS.NS,night,spans a session the series lacks,35
+TCS.NS,night,special session at either end,20
+TCS.NS,day,special session (Muhurat / weekend),10
+TATACONSUM.NS,row,before series start date,64
+TATACONSUM.NS,night,first row: no previous close,1
+TATACONSUM.NS,night,spans a session the series lacks,50
+TATACONSUM.NS,night,special session at either end,30
+TATACONSUM.NS,day,special session (Muhurat / weekend),15
+TMPV.NS,row,not an NSE session,265
+TMPV.NS,row,before series start date,78
+TMPV.NS,night,first row: no previous close,1
+TMPV.NS,night,spans a session the series lacks,50
+TMPV.NS,night,special session at either end,30
+TMPV.NS,day,special session (Muhurat / weekend),15
+TMPV.NS,night,night beyond +-20%,1
+TATASTEEL.NS,night,first row: no previous close,1
+TATASTEEL.NS,night,spans a session the series lacks,50
+TATASTEEL.NS,night,special session at either end,30
+TATASTEEL.NS,day,special session (Muhurat / weekend),15
+TATASTEEL.NS,night,night beyond +-20%,1
+TECHM.NS,night,first row: no previous close,1
+TECHM.NS,night,spans a session the series lacks,30
+TECHM.NS,night,special session at either end,18
+TECHM.NS,day,special session (Muhurat / weekend),9
+TITAN.NS,row,before series start date,70
+TITAN.NS,night,first row: no previous close,1
+TITAN.NS,night,spans a session the series lacks,51
+TITAN.NS,night,special session at either end,30
+TITAN.NS,day,special session (Muhurat / weekend),15
+TRENT.NS,night,first row: no previous close,1
+TRENT.NS,night,spans a session the series lacks,40
+TRENT.NS,night,special session at either end,22
+TRENT.NS,day,special session (Muhurat / weekend),11
+TRENT.NS,night,night beyond +-20%,1
+ULTRACEMCO.NS,row,before series start date,501
+ULTRACEMCO.NS,night,first row: no previous close,1
+ULTRACEMCO.NS,night,spans a session the series lacks,35
+ULTRACEMCO.NS,night,special session at either end,20
+ULTRACEMCO.NS,day,special session (Muhurat / weekend),10

@@ -6,7 +6,8 @@ Two passes, because the calendar needs every series:
    need no calendar.
 2. The calendar, from all row-stage survivors (src.sessions, src.nse).
 3. :func:`finish` per series: off-calendar rows, start date, scale glitches,
-   then a verdict on every night and every day, then the dividend adjustment.
+   then a verdict on every night and every day, the ``reversed_open`` flag,
+   and the dividend adjustment.
 
 Every removed row and every rejected return is counted in a :class:`DropLog`.
 A rejected return is counted once, under the first reason that applies.
@@ -24,6 +25,7 @@ from .data import adjust_for_dividends
 CLEAN_COLUMNS = [
     "Open", "High", "Low", "Close", "Volume", "Dividends", "Stock Splits",
     "session_kind", "night_kind", "night_days", "night_ok", "night_note", "day_ok", "day_note",
+    "reversed_open",
 ]
 
 
@@ -84,11 +86,18 @@ def finish(
     calendar: pd.DatetimeIndex,
     kinds: pd.Series,
     log: DropLog,
+    coverage_calendar: pd.DatetimeIndex | None = None,
 ) -> tuple[pd.DataFrame, dict[str, object]]:
-    """Calendar-dependent checks and return flags. Returns the clean frame and a summary row."""
+    """Calendar-dependent checks and return flags. Returns the clean frame and a summary row.
+
+    ``coverage_calendar`` is what the start-date rule measures coverage against.
+    Pass the sessions at least one series has: a session no Yahoo series has
+    (e.g. Saturday 2004-10-09) is a market-wide gap, not evidence that this
+    series is unreliable, and would otherwise drag start dates past it.
+    """
     df = _drop(rows, ~rows.index.isin(calendar), ticker, "not an NSE session", log)
 
-    rule = start_date(df.index, calendar)
+    rule = start_date(df.index, calendar if coverage_calendar is None else coverage_calendar)
     override = config.START_OVERRIDES.get(ticker)
     start = max(rule, pd.Timestamp(override[0])) if override else rule
     df = _drop(df, df.index < start, ticker, "before series start date", log)
@@ -116,9 +125,6 @@ def finish(
         stale = validate.stale_open(df)
         reject(night_note, stale, "stale index open (= previous close)", "night")
         reject(day_note, stale, "stale index open (= previous close)", "day")
-    bad = validate.bad_open(df)
-    reject(night_note, bad, "bad open: night and day cancel", "night")
-    reject(day_note, bad, "bad open: night and day cancel", "day")
     reject(night_note, validate.extreme_night(df), "night beyond +-20%", "night")
 
     out = adjust_for_dividends(df).join(nights)
@@ -127,6 +133,7 @@ def finish(
     out["night_note"] = night_note
     out["day_ok"] = day_note == ""
     out["day_note"] = day_note
+    out["reversed_open"] = validate.reversed_open(df) & out["night_ok"] & out["day_ok"]
     out = out[CLEAN_COLUMNS]
 
     summary = {
@@ -139,5 +146,6 @@ def finish(
         "rows": len(out),
         "nights_ok": int(out["night_ok"].sum()),
         "days_ok": int(out["day_ok"].sum()),
+        "reversed_opens": int(out["reversed_open"].sum()),
     }
     return out, summary

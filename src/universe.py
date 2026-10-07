@@ -99,3 +99,20 @@ def stock_tickers(universe: pd.DataFrame | None = None) -> dict[str, str]:
     """``{yahoo_ticker: company_name}`` for the frozen universe."""
     u = load_universe() if universe is None else universe
     return dict(zip(u["Ticker"], u["Company Name"]))
+
+
+def instruments(universe: pd.DataFrame | None = None) -> dict[str, tuple[str, str]]:
+    """``{ticker: (name, kind)}`` for every series in the study; kind is index, etf or stock."""
+    return {
+        **{t: (name, "index") for t, name in config.INDICES.items()},
+        **{t: (name, "etf") for t, name in config.ETFS.items()},
+        **{t: (name, "stock") for t, name in stock_tickers(universe).items()},
+    }
+
+
+def nse_ids(universe: pd.DataFrame | None = None) -> dict[str, tuple[str, str | None]]:
+    """``{ticker: (NSE symbol, ISIN or None)}`` for every NSE-listed stock and ETF."""
+    u = load_universe() if universe is None else universe
+    ids: dict[str, tuple[str, str | None]] = {t: (t.removesuffix(".NS"), None) for t in config.ETFS}
+    ids.update({t: (s, i) for t, s, i in zip(u["Ticker"], u["Symbol"], u["ISIN Code"])})
+    return ids

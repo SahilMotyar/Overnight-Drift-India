@@ -19,7 +19,7 @@ import pandas as pd
 from src import config
 from src.coverage import coverage_table, reference_calendar
 from src.data import cache_path, download, is_fresh
-from src.universe import freeze_universe, stock_tickers
+from src.universe import freeze_universe, instruments as list_instruments
 
 OUT = config.REPORTS / "phase1_coverage.csv"
 KINDS = ["index", "etf", "stock"]
@@ -35,11 +35,7 @@ def main() -> None:
     logging.getLogger("yfinance").setLevel(logging.WARNING)
 
     universe = freeze_universe(refresh=args.refresh_universe)
-    instruments: dict[str, tuple[str, str]] = {
-        **{t: (name, "index") for t, name in config.INDICES.items()},
-        **{t: (name, "etf") for t, name in config.ETFS.items()},
-        **{t: (name, "stock") for t, name in stock_tickers(universe).items()},
-    }
+    instruments = list_instruments(universe)
 
     frames: dict[str, pd.DataFrame] = {}
     failed: dict[str, str] = {}

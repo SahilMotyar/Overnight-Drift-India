@@ -12,6 +12,7 @@ cached as an empty marker, so it is never requested twice.
 
 from __future__ import annotations
 
+import http.client
 import io
 import logging
 import time
@@ -65,17 +66,34 @@ def index_close_url(day: pd.Timestamp) -> str:
     return INDEX_CLOSE.format(dmy=f"{pd.Timestamp(day):%d%m%Y}")
 
 
+# Seconds to wait before each retry of a transient failure (dropped connection,
+# timeout, 5xx). A 404 is an answer, not a failure, and is never retried.
+RETRY_WAITS: tuple[float, ...] = (2, 10, 30)
+_TRANSIENT = (urllib.error.URLError, http.client.HTTPException, ConnectionError, TimeoutError)
+
+
 def _get(url: str) -> bytes | None:
-    """Fetch ``url``; ``None`` if NSE has no such file (404). Other failures raise."""
-    try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=_HEADERS), timeout=30) as r:
-            return r.read()
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return None
-        raise
-    finally:
-        time.sleep(config.NSE_REQUEST_DELAY_SECONDS)
+    """Fetch ``url``; ``None`` if NSE has no such file (404). Other failures raise
+    once the retries are used up."""
+    for wait in (*RETRY_WAITS, None):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=_HEADERS), timeout=30) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return None
+            if e.code < 500 or wait is None:
+                raise
+            error: Exception = e
+        except _TRANSIENT as e:
+            if wait is None:
+                raise
+            error = e
+        finally:
+            time.sleep(config.NSE_REQUEST_DELAY_SECONDS)
+        logger.warning("NSE request failed (%s); retrying in %ss: %s", error, wait, url)
+        time.sleep(wait)
+    raise AssertionError("unreachable")
 
 
 def parse_bhavcopy(raw_zip: bytes) -> pd.DataFrame:
@@ -91,15 +109,26 @@ def parse_bhavcopy(raw_zip: bytes) -> pd.DataFrame:
     return df[BHAV_COLUMNS]
 
 
+_PRICE_FIELDS = ["OPEN", "HIGH", "LOW", "CLOSE", "LAST", "PREVCLOSE", "TOTTRDQTY",
+                 *INDEX_COLUMNS[1:]]
+
+
+def _numeric(df: pd.DataFrame) -> pd.DataFrame:
+    """NSE writes "-" for a value it does not have (e.g. an index with no open)."""
+    for col in df.columns.intersection(_PRICE_FIELDS):
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
+
+
 def _cached(path: Path, fetch, parse) -> pd.DataFrame | None:
     if path.exists():
-        return None if path.stat().st_size == 0 else pd.read_csv(path, dtype={"ISIN": str})
+        return None if path.stat().st_size == 0 else _numeric(pd.read_csv(path, dtype={"ISIN": str}))
     raw = fetch()
     path.parent.mkdir(parents=True, exist_ok=True)
     if raw is None:
         path.write_bytes(b"")  # marker: NSE has no file for this day
         return None
-    df = parse(raw)
+    df = _numeric(parse(raw))
     df.to_csv(path, index=False)
     return df
 

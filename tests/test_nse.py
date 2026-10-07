@@ -47,6 +47,52 @@ def test_missing_day_is_cached_and_never_refetched(tmp_path, monkeypatch) -> Non
     assert len(calls) == 1
 
 
+class _Resp(io.BytesIO):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_dropped_connection_is_retried_but_404_is_an_answer(monkeypatch) -> None:
+    import http.client
+    import urllib.error
+
+    monkeypatch.setattr(nse.config, "NSE_REQUEST_DELAY_SECONDS", 0)
+    monkeypatch.setattr(nse, "RETRY_WAITS", (0, 0))
+    monkeypatch.setattr(nse.time, "sleep", lambda s: None)
+
+    calls = []
+
+    def flaky(req, timeout):
+        calls.append(req.full_url)
+        if len(calls) == 1:
+            raise http.client.RemoteDisconnected("Remote end closed connection without response")
+        return _Resp(b"data")
+
+    monkeypatch.setattr(nse.urllib.request, "urlopen", flaky)
+    assert nse._get("https://x/file.zip") == b"data" and len(calls) == 2
+
+    def missing(req, timeout):
+        calls.append(req.full_url)
+        raise urllib.error.HTTPError(req.full_url, 404, "Not Found", None, None)
+
+    calls.clear()
+    monkeypatch.setattr(nse.urllib.request, "urlopen", missing)
+    assert nse._get("https://x/none.zip") is None and len(calls) == 1
+
+    def always_down(req, timeout):
+        calls.append(req.full_url)
+        raise ConnectionResetError("reset")
+
+    calls.clear()
+    monkeypatch.setattr(nse.urllib.request, "urlopen", always_down)
+    with pytest.raises(ConnectionResetError):
+        nse._get("https://x/down.zip")
+    assert len(calls) == 3  # first try + two retries
+
+
 def test_verify_sessions_records_answers_and_reuses_them(tmp_path, monkeypatch) -> None:
     answers = {pd.Timestamp("2025-03-18"): True, pd.Timestamp("2000-01-26"): False}
     asked = []

@@ -68,13 +68,13 @@ def test_extreme_night_is_symmetric_in_simple_returns() -> None:
     assert validate.extreme_night(df).tolist() == [False, True, True, False]
 
 
-def test_bad_open_needs_opposite_cancelling_moves() -> None:
+def test_reversed_open_needs_opposite_cancelling_moves() -> None:
     df = _frame([
         NORMAL,
         (80.0, 101, 79, 100.0, 10),   # open -20% then day +25%: back to ~prev close
-        (80.0, 81, 79, 80.0, 10),     # a real -20% gap that holds
+        (80.0, 81, 79, 80.0, 10),     # a -20% gap that holds
     ])
-    flags = validate.bad_open(df).tolist()
+    flags = validate.reversed_open(df).tolist()
     assert flags == [False, True, False]
 
 
@@ -82,7 +82,7 @@ def test_checks_never_modify_their_input() -> None:
     df = _frame([NORMAL, (100.5, 100.5, 100.5, 100.5, 0)])
     before = df.copy()
     for check in (validate.nonpositive, validate.ohlc_inconsistent, validate.placeholder,
-                  validate.no_trades, validate.stale_open, validate.extreme_night, validate.bad_open):
+                  validate.no_trades, validate.stale_open, validate.extreme_night, validate.reversed_open):
         check(df)
     validate.scale_glitches(df["Close"])
     pd.testing.assert_frame_equal(df, before)
