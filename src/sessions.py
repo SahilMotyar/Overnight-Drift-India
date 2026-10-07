@@ -24,11 +24,14 @@ import pandas as pd
 from . import config
 
 
-def consensus_share(frames: dict[str, pd.DataFrame]) -> pd.Series:
+def consensus_share(
+    frames: dict[str, pd.DataFrame], min_series: int = config.CONSENSUS_MIN_SERIES
+) -> pd.Series:
     """For every date any series has, the share of series alive then that have a row.
 
     A series is alive between its own first and last row, so a stock listed in
-    2017 does not count against 2005 dates.
+    2017 does not count against 2005 dates. Where fewer than ``min_series`` are
+    alive the share is NaN: too few to vote (before 1996 only TMPV is alive).
     """
     dates = pd.DatetimeIndex([])
     for df in frames.values():
@@ -39,7 +42,8 @@ def consensus_share(frames: dict[str, pd.DataFrame]) -> pd.Series:
         idx = pd.DatetimeIndex(df.index)
         alive += (dates >= idx[0]) & (dates <= idx[-1])
         has += dates.isin(idx)
-    return pd.Series(has / np.maximum(alive, 1), index=dates, name="share")
+    share = np.where(alive >= min_series, has / np.maximum(alive, 1), np.nan)
+    return pd.Series(share, index=dates, name="share")
 
 
 def disputed_dates(

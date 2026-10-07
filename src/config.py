@@ -142,13 +142,30 @@ EXTREME_NIGHT = 0.20
 # directions, and nearly cancel, point to a bad Open. Both are rejected.
 BAD_OPEN_MIN_JUMP = 0.15
 
+# A series starts after its last COVERAGE_WINDOW-session stretch with rows on
+# fewer than MIN_COVERAGE of sessions. Catches NESTLEIND's 2003-09 placeholder
+# years (-> 2010-01-08) and NIFTYBEES' 2012-13 no-trade spell.
+COVERAGE_WINDOW = 250
+MIN_COVERAGE = 0.9
+
+# Where Yahoo's history is complete but belongs to another security, coverage
+# cannot see it. Each override is a "not before" date, backed by a jump in the
+# data on that day; the later of rule and override wins.
+START_OVERRIDES: dict[str, tuple[str, str]] = {
+    "TCS.NS": ("2004-08-25", "listed on NSE 2004-08-25 (IPO); earlier rows are not TCS"),
+    "ULTRACEMCO.NS": ("2004-08-24", "listed 2004-08-24 after the L&T cement demerger; -71% night that day"),
+    "BAJAJ-AUTO.NS": ("2008-05-26", "new Bajaj Auto listed 2008-05-26; earlier rows are the pre-demerger company"),
+    "BAJAJFINSV.NS": ("2008-05-26", "listed 2008-05-26 in the Bajaj demerger; -91% night that day"),
+}
+
 # --------------------------------------------------------------------------
 # Trading calendar (Phase 2)
 # --------------------------------------------------------------------------
 
 # A date is a candidate session if at least this share of the stocks listed at
-# the time have a real row on it.
+# the time have a real row on it, and at least CONSENSUS_MIN_SERIES are listed.
 CONSENSUS_SHARE = 0.5
+CONSENSUS_MIN_SERIES = 5
 
 # Dates where the stocks are split between these shares, or where consensus
 # and the index calendar disagree, are settled by whether NSE published a

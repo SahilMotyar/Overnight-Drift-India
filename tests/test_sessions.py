@@ -16,11 +16,18 @@ def test_consensus_counts_only_series_alive_on_the_date() -> None:
     old = _frame(["2026-01-05", "2026-01-06", "2026-01-07"])
     new = _frame(["2026-01-06", "2026-01-07"])  # listed on the 6th
     junk = _frame(["2026-01-05", "2026-01-07"])  # missing the 6th
-    share = sessions.consensus_share({"old": old, "new": new, "junk": junk})
+    share = sessions.consensus_share({"old": old, "new": new, "junk": junk}, min_series=2)
     # 5th: old+junk alive and present (new not yet listed) -> 1.0
     assert share[pd.Timestamp("2026-01-05")] == 1.0
     # 6th: all three alive, junk missing -> 2/3
     assert share[pd.Timestamp("2026-01-06")] == pytest.approx(2 / 3)
+
+
+def test_too_few_live_series_cannot_vote() -> None:
+    lone = _frame(["1995-01-02", "1995-01-03"])
+    share = sessions.consensus_share({"lone": lone}, min_series=5)
+    assert share.isna().all()
+    assert len(sessions.build_calendar(share, pd.Series(dtype=bool))) == 0
 
 
 def test_disputes_are_disagreements_and_split_dates() -> None:
