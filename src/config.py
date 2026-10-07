@@ -100,6 +100,15 @@ NIFTY50_LIST_URLS: tuple[str, ...] = (
 # Download each series' full history; Phase 2 decides its first clean day.
 YF_PERIOD = "max"
 
+# Pause between Yahoo downloads (cache hits don't wait).
+YF_REQUEST_DELAY_SECONDS = 1.0
+
+# Phase 1 coverage compares every series against the union of these indices'
+# trading days, a stand-in for the NSE holiday calendar (NSE and BSE almost
+# always close on the same days). Sensex extends it back before Nifty's Yahoo
+# history starts in 2007. Checking against NSE's own holiday lists is Phase 2.
+CALENDAR_TICKERS: tuple[str, ...] = ("^NSEI", "^BSESN")
+
 # Prices are downloaded with auto_adjust=False and cached as Yahoo serves them:
 # OHLC already split-adjusted (so splits and bonus issues do not show up as
 # fake overnight crashes), plus "Adj Close", "Dividends" and "Stock Splits".

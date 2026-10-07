@@ -1,0 +1,55 @@
+ticker,kind,name,first,last,rows,before_ref,missing,missing_%,extra,behind,dup_dates,weekend,max_gap_days
+^BSESN,index,Sensex,1997-07-01,2026-10-06,7209,0,7,0.1,0,0,0,0,6
+^NSEI,index,Nifty 50,2007-09-17,2026-10-06,4674,0,11,0.23,0,0,0,1,6
+^NSEBANK,index,Nifty Bank,2007-09-17,2026-10-06,4689,0,1,0.02,5,0,0,0,6
+NIFTYBEES.NS,etf,Nippon India ETF Nifty BeES,2009-01-02,2026-10-05,4381,0,1,0.02,15,1,0,4,6
+TMPV.NS,stock,Tata Motors Passenger Vehicles Ltd.,1991-01-02,2026-10-06,9029,1694,0,0.0,119,0,0,3,6
+CIPLA.NS,stock,Cipla Ltd.,1996-01-01,2026-10-06,7725,391,0,0.0,118,0,0,3,6
+DRREDDY.NS,stock,Dr. Reddy's Laboratories Ltd.,1996-01-01,2026-10-06,7723,391,0,0.0,116,0,0,3,6
+EICHERMOT.NS,stock,Eicher Motors Ltd.,1996-01-01,2026-10-06,7723,391,0,0.0,116,0,0,3,6
+HDFCBANK.NS,stock,HDFC Bank Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+HINDALCO.NS,stock,Hindalco Industries Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+HINDUNILVR.NS,stock,Hindustan Unilever Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+ITC.NS,stock,ITC Ltd.,1996-01-01,2026-10-06,7723,391,0,0.0,116,0,0,3,6
+INFY.NS,stock,Infosys Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+M&M.NS,stock,Mahindra & Mahindra Ltd.,1996-01-01,2026-10-06,7724,391,0,0.0,117,0,0,3,6
+ONGC.NS,stock,Oil & Natural Gas Corporation Ltd.,1996-01-01,2026-10-06,7723,391,0,0.0,116,0,0,3,6
+RELIANCE.NS,stock,Reliance Industries Ltd.,1996-01-01,2026-10-06,7723,391,0,0.0,116,0,0,3,6
+SBIN.NS,stock,State Bank of India,1996-01-01,2026-10-06,7724,391,0,0.0,117,0,0,3,6
+SUNPHARMA.NS,stock,Sun Pharmaceutical Industries Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+TATACONSUM.NS,stock,Tata Consumer Products Ltd.,1996-01-01,2026-10-05,7722,391,0,0.0,116,1,0,3,6
+TATASTEEL.NS,stock,Tata Steel Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+TITAN.NS,stock,Titan Company Ltd.,1996-01-01,2026-10-06,7726,391,0,0.0,119,0,0,3,6
+AXISBANK.NS,stock,Axis Bank Ltd.,1998-11-27,2026-10-05,6963,0,0,0.0,91,1,0,3,6
+KOTAKBANK.NS,stock,Kotak Mahindra Bank Ltd.,2001-07-02,2026-10-06,6290,0,0,0.0,60,0,0,3,6
+ADANIENT.NS,stock,Adani Enterprises Ltd.,2002-07-01,2026-10-06,6030,0,0,0.0,48,0,0,3,6
+APOLLOHOSP.NS,stock,Apollo Hospitals Enterprise Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+ASIANPAINT.NS,stock,Asian Paints Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+BAJAJ-AUTO.NS,stock,Bajaj Auto Ltd.,2002-07-01,2026-10-06,6031,0,0,0.0,49,0,0,3,6
+BAJFINANCE.NS,stock,Bajaj Finance Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+BEL.NS,stock,Bharat Electronics Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+BHARTIARTL.NS,stock,Bharti Airtel Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+GRASIM.NS,stock,Grasim Industries Ltd.,2002-07-01,2026-10-05,6026,0,0,0.0,45,1,0,3,6
+ICICIBANK.NS,stock,ICICI Bank Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+LT.NS,stock,Larsen & Toubro Ltd.,2002-07-01,2026-10-06,6031,0,0,0.0,49,0,0,3,6
+SHRIRAMFIN.NS,stock,Shriram Finance Ltd.,2002-07-01,2026-10-06,6031,0,0,0.0,49,0,0,3,6
+TRENT.NS,stock,Trent Ltd.,2002-07-01,2026-10-06,6028,0,0,0.0,46,0,0,3,6
+BAJAJFINSV.NS,stock,Bajaj Finserv Ltd.,2002-08-12,2026-10-06,5997,0,1,0.02,46,0,0,3,6
+HCLTECH.NS,stock,HCL Technologies Ltd.,2002-08-12,2026-10-06,6002,0,0,0.0,50,0,0,4,6
+NESTLEIND.NS,stock,Nestle India Ltd.,2002-08-12,2026-10-05,5999,0,0,0.0,48,1,0,3,6
+TCS.NS,stock,Tata Consultancy Services Ltd.,2002-08-12,2026-10-06,5999,0,1,0.02,48,0,0,3,6
+ULTRACEMCO.NS,stock,UltraTech Cement Ltd.,2002-08-12,2026-10-06,5998,0,0,0.0,46,0,0,3,6
+JSWSTEEL.NS,stock,JSW Steel Ltd.,2003-05-08,2026-10-05,5807,0,0,0.0,35,1,0,3,6
+MARUTI.NS,stock,Maruti Suzuki India Ltd.,2003-07-09,2026-10-06,5764,0,0,0.0,35,0,0,3,6
+NTPC.NS,stock,NTPC Ltd.,2004-11-05,2026-10-06,5417,0,0,0.0,22,0,0,3,6
+TECHM.NS,stock,Tech Mahindra Ltd.,2006-08-28,2026-10-06,4965,0,0,0.0,18,0,0,3,6
+POWERGRID.NS,stock,Power Grid Corporation of India Ltd.,2007-10-05,2026-10-06,4690,0,0,0.0,18,0,0,3,6
+ADANIPORTS.NS,stock,Adani Ports and Special Economic Zone Ltd.,2007-11-27,2026-10-05,4653,0,0,0.0,18,1,0,3,6
+COALINDIA.NS,stock,Coal India Ltd.,2010-11-04,2026-10-06,3931,0,0,0.0,15,0,0,3,6
+INDIGO.NS,stock,InterGlobe Aviation Ltd.,2015-11-10,2026-10-05,2695,0,0,0.0,9,1,0,3,5
+BSE.NS,stock,BSE Ltd.,2017-02-03,2026-10-06,2394,0,0,0.0,9,0,0,3,5
+SBILIFE.NS,stock,SBI Life Insurance Company Ltd.,2017-10-03,2026-10-06,2231,0,0,0.0,9,0,0,3,5
+HDFCLIFE.NS,stock,HDFC Life Insurance Company Ltd.,2017-11-17,2026-10-06,2199,0,0,0.0,9,0,0,3,5
+MAXHEALTH.NS,stock,Max Healthcare Institute Ltd.,2020-08-21,2026-10-06,1521,0,0,0.0,7,0,0,2,5
+ETERNAL.NS,stock,Eternal Ltd.,2021-07-23,2026-10-06,1292,0,0,0.0,6,0,0,1,5
+JIOFIN.NS,stock,Jio Financial Services Ltd.,2023-08-21,2026-10-06,777,0,0,0.0,6,0,0,1,4
