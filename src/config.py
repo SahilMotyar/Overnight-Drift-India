@@ -100,10 +100,13 @@ NIFTY50_LIST_URLS: tuple[str, ...] = (
 # Download each series' full history; Phase 2 decides its first clean day.
 YF_PERIOD = "max"
 
-# auto_adjust rescales Open as well as Close, so splits and bonus issues do not
-# show up as fake overnight crashes. Dividends then land in the night return
-# (the ex-date gap); Phase 3 reports the night with and without ex-dates.
-YF_AUTO_ADJUST = True
+# Prices are downloaded with auto_adjust=False and cached as Yahoo serves them:
+# OHLC already split-adjusted (so splits and bonus issues do not show up as
+# fake overnight crashes), plus "Adj Close", "Dividends" and "Stock Splits".
+# src.data.adjust_for_dividends then rescales OHLC by Adj Close / Close, which
+# is what auto_adjust=True does internally. Doing it ourselves keeps the raw
+# Close (Phase 2 cross-checks it against NSE) and the ex-dates (Phase 3
+# reports the night with and without them, since dividends land in the night).
 
 # --------------------------------------------------------------------------
 # Subperiods (Phase 4)
