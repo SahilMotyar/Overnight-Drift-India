@@ -115,6 +115,17 @@ def _excursion_end(lc: np.ndarray, i: int, jump: float, max_rows: int) -> int | 
     return None
 
 
+def implausible_dividend(df: pd.DataFrame, max_yield: float = config.MAX_DIVIDEND_YIELD) -> pd.Series:
+    """Ex-dates whose dividend exceeds ``max_yield`` of the previous close.
+
+    Such a dividend was not scaled for later splits. Yahoo's ``Adj Close``
+    multiplies every earlier price by ``1 - D / prev Close``, so everything
+    before it is mis-scaled (negative, past 100%). Callers start the series
+    on the last one rather than repair Yahoo's factor.
+    """
+    return (df["Dividends"] / df["Close"].shift(1)) > max_yield
+
+
 # --------------------------------------------------------------------------
 # Return checks
 # --------------------------------------------------------------------------

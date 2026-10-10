@@ -54,8 +54,8 @@ explains (a loss stops at zero) goes away.
 |---|---|---|
 | 0 | Scaffold: venv, pinned deps, config, cache | **done** (2026-10-06) |
 | 1 | Acquisition: indices, ETF, Nifty 50 stocks | **done** (2026-10-07; 54/54 series) |
-| 2 | Validation layer + drop table | **done** (2026-10-07; 300,863 usable nights) |
-| 3 | Decomposition: the reel's chart on Indian data | not started |
+| 2 | Validation layer + drop table | **done** (2026-10-07; 300,282 usable nights after the Phase 3 dividend fix) |
+| 3 | Decomposition: the reel's chart on Indian data | **done** (2026-10-10) |
 | 4 | Is it real? Significance, subperiods, cross-section | not started |
 | 5 | Indian cost model + break-even table | not started |
 | 6 | Tradable variants, gross vs net | not started |
@@ -95,6 +95,9 @@ src/nse.py         NSE bhavcopy / index-close archive reader, cached
 src/sessions.py    trading calendar, special sessions, night labels
 src/clean.py       Phase 2 pipeline + drop log + start dates
 src/spotcheck.py   cleaned Yahoo returns vs NSE official prices
+src/decompose.py   Phase 3 night / day legs, chained curves, identity check
+src/summary.py     Phase 3 leg statistics, night kinds, sensitivity, vs-index gaps
+src/figures.py     Phase 3 charts (growth chart, small multiples)
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -129,8 +132,9 @@ reports/           findings.md + figures
 ### Phase 2: Validation
 `python -m scripts.phase2_validate`. It reads the Phase 1 cache only, asks NSE
 about disputed days (cached), and writes `data/clean/<ticker>.csv` plus
-`reports/phase2_*.csv`. From 317,503 raw rows it keeps 304,245, with
-**300,863 usable nights** and 303,600 usable days.
+`reports/phase2_*.csv`. From 317,503 raw rows it keeps 303,657, with
+**300,282 usable nights** and 303,013 usable days (after the dividend fix in
+item 10, found at the Phase 3 checkpoint).
 
 The check that mattered most was **asking NSE**. NSE publishes a bhavcopy
 for every session and only for sessions, and its archive goes back to Nov
@@ -157,7 +161,7 @@ also give an independent check of Yahoo's.
    - *Special sessions.* 30 Muhurat sessions (one per Diwali, 1996-2025) and
      30 weekend sessions.
 2. **Rows removed** (ticker x reason in `reports/phase2_drop_table.csv`):
-   - before the series' start date: 6,079
+   - before the series' start date: 6,667
    - placeholders (flat at previous close, zero volume; Yahoo's holiday
      filler): 5,124 across 51 series
    - before NSE's equity segment opened (TMPV, 1991-94): 1,001
@@ -203,7 +207,10 @@ also give an independent check of Yahoo's.
    - Most 1996 starts move to mid-1996.
    - Four "not before" overrides, each backed by a jump in the data: TCS
      2004-08-25 (IPO), ULTRACEMCO 2004-08-24, BAJAJ-AUTO and BAJAJFINSV
-     2008-05-26 (demerger).
+     2008-05-26 (demerger). Three of them bind; BAJAJ-AUTO's coverage date
+     (2008-11-21) is later anyway.
+   - Two starts moved by implausible dividends (item 10): ADANIENT
+     2004-06-28, EICHERMOT 1997-07-21.
 8. **Night labels.** Every row gets a `night_kind` (weeknight / weekend /
    holiday / gap / first) and `night_days`, its calendar length.
 9. **Spot-check vs NSE** (`reports/phase2_spotcheck.csv`): 40 random sessions,
@@ -220,31 +227,84 @@ also give an independent check of Yahoo's.
      2019-03-19), and 5 genuine Yahoo errors (wrong closes on 2019-03-18,
      BAJAJFINSV 2012-09-06). So expect roughly **0.4% of nights carrying
      undetected Yahoo errors**.
+10. **Implausible dividends** (added at the Phase 3 checkpoint). Phase 2
+    checked raw prices, but Phase 3 uses dividend-adjusted ones, and those had
+    gone negative for ADANIENT's first 46 rows. The cause: 4 Yahoo dividends
+    were never scaled for later splits, at 41-121% of the previous close
+    (ADANIENT 2002-09-04, 2003-09-04, 2004-06-28; EICHERMOT 1997-07-21).
+    Yahoo's factor `1 - D / prev Close` then mis-scales every earlier price,
+    and the ex-date nights came out at -570%, +767%, +108% and +66%.
+    - The rule: a dividend above 20% of the previous close starts the series
+      on that ex-date. The largest real one is Coal India's 9.6% (2014-01-17),
+      so the gap between real and mis-scaled dividends is wide.
+    - `finish` now refuses to write any adjusted price <= 0.
 - TMPV: only the demerger night is rejected, so the history is kept from
   1996-06-05. This replaces "start after the demerger", which would have kept
   one year.
 - CHECKPOINT: done. Drop table, start dates, spot-check, reviewed rejections.
 
 ### Phase 3: Decomposition
-From Phase 2: read `data/clean/` only. A night counts only where `night_ok`,
-and a day only where `day_ok`. Report the main numbers with and without
-`reversed_open` days. Real zero nights (official Open = previous close, 4.0%
-of stock nights) stay in.
-- Build the night, day and hold series per instrument. A test asserts the
-  identity holds to 1e-10 on every day.
-- Figures:
-  - cumulative night, day and hold on a log axis, for each index and the ETF
-  - small multiples for the stocks
-- Summary table, one row per instrument:
-  - CAGR of each leg
-  - mean bp per night and per day
-  - % of positive nights and days
-  - volatility of each leg
-- Split the nights into weeknight, weekend and holiday.
-- **Dividends:** with adjusted data, a dividend shows up in the night (the
-  ex-date gap). Report the night with and without ex-dates so the "night
-  premium" isn't just dividends.
-- CHECKPOINT: the summary table and the Nifty chart.
+`python -m scripts.phase3_decompose`. It reads `data/clean/` only and writes
+`reports/phase3_*.csv` and `reports/figures/phase3_*.png`.
+- *Inputs.* A night counts only where `night_ok`, a day only where `day_ok`.
+  Real zero nights (official Open = previous close, 4.0% of stock nights)
+  stay in.
+- *Identity.* `(1 + night)(1 + day) = Close / prev Close` holds to 2.2e-16
+  on every series. The Open cancels, so this guards the implementation (both
+  legs from the same rows), not the data.
+- *Two holds.* `split_hold` = nights x days exactly. Buy-and-hold also
+  contains the returns that can't be split (mostly nights across sessions
+  Yahoo lacks), so it runs a little higher (Nifty x5.04 vs x4.16).
+
+**Results.** Growth of Rs 1 by leg; mean / median bp per return:
+
+| Series | Nights | Days | Night mean / median | Day mean / median |
+|---|---|---|---|---|
+| Nifty 50 (2007-) | x55.5 (+23.5%/yr) | x0.075 (-12.7%/yr) | +8.9 / +7.7 | -4.9 / -4.6 |
+| Sensex (1997-) | x14,543 (+38.8%/yr) | /1,203 (-21.5%/yr) | +13.8 / +15.1 | -9.1 / -6.3 |
+| Nifty Bank (2007-) | x67.6 (+24.8%/yr) | x0.11 (-11.1%/yr) | +9.5 / +12.3 | -3.7 / -3.6 |
+| NIFTYBEES (2013-) | x359M | /106M | +63.4 / +22.7 | -54.1 / -25.7 |
+
+- **The reel's pattern holds everywhere.** All 50 stocks: nights beat
+  days. 49 of 50 lose money in the day; the exception is INDIGO, at +2.9%/yr.
+  Across stocks, the median of the mean night is +17.3 bp and of the mean day
+  -6.9 bp. 61% of stock nights are up against 46% of days.
+- **NIFTYBEES's night/day split comes from its opening price, not the
+  market.** Until 2018 its nights track ^NSEI within about +-12 bp a year.
+  From 2019 the ETF opens far above where the index opens: the median gap
+  is +186 bp a night in 2021 and still +23-26 bp in 2024-26, and the day
+  gives it back. Overnight, the ETF and the index can't really move apart
+  by this much, so the ETF's official open isn't a price the index supports.
+  This matters for Phase 5/6, where the ETF was to be the realistic way to
+  trade the index.
+- **Stocks vs the index.** From 2011 the equal-weight stock night tracks
+  ^NSEI within about 0-7 bp a year. In 2007-2010 it runs 11-38 bp above.
+  That fits the late-2010 pre-open call auction (before it, a stock's "open"
+  was its first trade), and it is why Phase 4 keeps pre-2011 as its own
+  subperiod.
+- **Nights by length.** Weekend nights do not earn more than weeknights:
+  Nifty earns 5.1 bp per weekend night vs 9.3 bp per weeknight, and all
+  stocks pooled earn 16.2 vs 18.4 bp. Per calendar day, a weekend earns about
+  a third as much. If the drift were pay for bearing risk while the market
+  is shut, longer nights should earn more. Holiday nights earn the most
+  (Nifty 16.5 bp; n = 239).
+- **Robustness.**
+  - Dropping reversed opens moves the median stock night from 17.3 to 17.2 bp.
+  - Dropping ex-dividend nights moves it to 17.0 bp, so the night premium is
+    not dividends.
+  - Restoring the 7 genuine +-20% nights moves EICHERMOT from 19.8 to
+    21.3 bp, ONGC from 21.6 to 21.8 bp and NESTLEIND from 12.2 to 11.7 bp.
+- **Charts:**
+  - `phase3_nifty.png` (the reel's chart, on Nifty)
+  - `phase3_indices.png`
+  - `phase3_stocks.png` (all 50)
+  - `phase3_longest_stock.png` (Tata Steel 1996-2026: nights x59.6M, days
+    /2.8M, the Micron analogue)
+
+  They follow the dataviz method: nights blue, days orange (palette
+  validated), "nights x days" gray, and a log axis.
+- CHECKPOINT: done. Summary table, Nifty chart, night kinds, sensitivity,
+  vs-index gaps.
 
 ### Phase 4: Is it real?
 Subperiods are fixed now, before any results are seen:
@@ -356,7 +416,10 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 1. **The 7 genuine +-20% nights** (EICHERMOT x5 1998-2001, ONGC 2002-05-06,
    NESTLEIND 2010-04-23). NSE confirms each as a real price move, but the +-20%
    rule rejects them along with the corporate actions. For EICHERMOT alone,
-   rejecting them lowers the mean night by about 1.4 bp. Options:
+   rejecting them lowers the mean night by about 1.4 bp. Measured in Phase 3:
+   restoring them moves EICHERMOT from 19.8 to 21.3 bp, ONGC from 21.6 to
+   21.8 bp and NESTLEIND from 12.2 to 11.7 bp. It does not move the median
+   stock at all. Options:
    **keep them rejected and report the sensitivity in Phase 3**, or reinstate
    these 7 by name.
 
@@ -410,3 +473,18 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
     Yahoo volume (9-40% of normal) or an NSE file on a holiday.
   - Start-date coverage ignores sessions no Yahoo series has. Without this,
     LT jumped to 2004-10-11 and JSWSTEEL to 2005-11-28.
+- **Phase 3 (2026-10-10).**
+  - Rejected returns leave their leg flat. Both `split_hold` (= nights x days,
+    exact) and true buy-and-hold are reported, so nothing hides the returns
+    Phase 2 couldn't split.
+  - Medians are reported next to means everywhere, because freak opening
+    prints (NIFTYBEES, pre-2011 stocks) move means.
+  - Phase 2 fix found here: dividends above 20% of the previous close start
+    the series on that ex-date (ADANIENT -> 2004-06-28, EICHERMOT ->
+    1997-07-21), and adjusted prices <= 0 now fail loudly. It went into the
+    Phase 3 (4/4) commit, alongside the checkpoint that found it.
+  - Longest clean history = most accepted nights: TATASTEEL (7,519).
+  - Charts: palette checked with the dataviz validator (blue/orange: all
+    checks pass, CVD dE 24.7). Every chart was rendered and looked at; fixes
+    from that are in the commit (scientific notation -> divisions, clipped
+    year labels and y title, axis padding beyond the data).

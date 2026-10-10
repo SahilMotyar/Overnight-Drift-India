@@ -122,10 +122,11 @@ NIFTYBEES.NS,night,first row: no previous close,1
 NIFTYBEES.NS,night,spans a session the series lacks,18
 NIFTYBEES.NS,night,special session at either end,16
 NIFTYBEES.NS,day,special session (Muhurat / weekend),8
+ADANIENT.NS,row,before series start date,497
 ADANIENT.NS,night,first row: no previous close,1
-ADANIENT.NS,night,spans a session the series lacks,39
-ADANIENT.NS,night,special session at either end,22
-ADANIENT.NS,day,special session (Muhurat / weekend),11
+ADANIENT.NS,night,spans a session the series lacks,35
+ADANIENT.NS,night,special session at either end,20
+ADANIENT.NS,day,special session (Muhurat / weekend),10
 ADANIENT.NS,night,night beyond +-20%,1
 ADANIPORTS.NS,night,first row: no previous close,1
 ADANIPORTS.NS,night,spans a session the series lacks,32
@@ -186,10 +187,10 @@ DRREDDY.NS,night,first row: no previous close,1
 DRREDDY.NS,night,spans a session the series lacks,50
 DRREDDY.NS,night,special session at either end,30
 DRREDDY.NS,day,special session (Muhurat / weekend),15
-EICHERMOT.NS,row,before series start date,260
+EICHERMOT.NS,row,before series start date,351
 EICHERMOT.NS,row,scale glitch: jump that reverts within 5 rows,1
 EICHERMOT.NS,night,first row: no previous close,1
-EICHERMOT.NS,night,spans a session the series lacks,57
+EICHERMOT.NS,night,spans a session the series lacks,56
 EICHERMOT.NS,night,special session at either end,28
 EICHERMOT.NS,day,special session (Muhurat / weekend),14
 EICHERMOT.NS,night,night beyond +-20%,5

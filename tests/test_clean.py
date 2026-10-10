@@ -128,6 +128,28 @@ def test_sessions_no_series_has_do_not_move_the_start() -> None:
     assert out.loc[cal[130], "night_kind"] == "gap"  # the night across them is still rejected
 
 
+def test_mis_scaled_dividend_moves_the_start_to_its_ex_date() -> None:
+    """ADANIENT 2002-09-04: a dividend bigger than the price makes Yahoo's
+    adjusted prices before it negative."""
+    raw = _raw(CAL[:8], close=np.full(8, 1.36))
+    raw.loc[CAL[4], "Dividends"] = 1.45
+    raw["Adj Close"] = raw["Close"] * np.where(raw.index < CAL[4], 1 - 1.45 / 1.36, 1.0)
+    out, summary = clean.finish(raw, "X.NS", False, CAL, KINDS, clean.DropLog())
+    assert out.index[0] == CAL[4] and summary["start_by"] == "implausible dividend"
+    assert (out[["Open", "High", "Low", "Close"]] > 0).all().all()
+    assert out.loc[CAL[4], "night_kind"] == "first"  # the corrupted ex-date night is never used
+
+
+def test_nonpositive_adjusted_prices_fail_loudly(monkeypatch) -> None:
+    # switch the dividend check off, so the bad dividend reaches the adjustment
+    monkeypatch.setattr(clean.validate, "implausible_dividend", lambda df: pd.Series(False, index=df.index))
+    raw = _raw(CAL[:8], close=np.full(8, 1.36))
+    raw.loc[CAL[4], "Dividends"] = 1.45
+    raw["Adj Close"] = raw["Close"] * np.where(raw.index < CAL[4], 1 - 1.45 / 1.36, 1.0)
+    with pytest.raises(ValueError, match="adjusted price"):
+        clean.finish(raw, "X.NS", False, CAL, KINDS, clean.DropLog())
+
+
 def test_start_override_is_a_floor(monkeypatch) -> None:
     monkeypatch.setitem(config.START_OVERRIDES, "X.NS", (str(CAL[5].date()), "test"))
     out, summary = clean.finish(_raw(CAL), "X.NS", False, CAL, KINDS, clean.DropLog())

@@ -1,9 +1,9 @@
-ticker,kind,start,start_by,override_reason,first_raw,last,rows,nights_ok,days_ok,reversed_opens
+ticker,kind,start,start_by,start_reason,first_raw,last,rows,nights_ok,days_ok,reversed_opens
 ^NSEI,index,2007-09-17,coverage rule,,2007-09-17,2026-10-06,4674,4591,4645,0
 ^BSESN,index,1997-07-01,coverage rule,,1997-07-01,2026-10-06,7199,7080,7169,0
 ^NSEBANK,index,2007-09-17,coverage rule,,2007-09-17,2026-10-06,4689,4643,4681,0
 NIFTYBEES.NS,etf,2013-06-24,coverage rule,,2009-01-02,2026-10-05,3267,3232,3259,5
-ADANIENT.NS,stock,2002-07-01,coverage rule,,2002-07-01,2026-10-06,5990,5927,5979,0
+ADANIENT.NS,stock,2004-06-28,implausible dividend,Yahoo dividend > 20% of price on 2004-06-28,2002-07-01,2026-10-06,5493,5436,5483,0
 ADANIPORTS.NS,stock,2007-11-27,coverage rule,,2007-11-27,2026-10-05,4637,4586,4628,2
 APOLLOHOSP.NS,stock,2002-07-01,coverage rule,,2002-07-01,2026-10-06,5990,5928,5979,3
 ASIANPAINT.NS,stock,2002-07-01,coverage rule,,2002-07-01,2026-10-06,5990,5928,5979,2
@@ -17,7 +17,7 @@ BHARTIARTL.NS,stock,2002-07-01,coverage rule,,2002-07-01,2026-10-06,5990,5928,59
 CIPLA.NS,stock,1996-06-04,coverage rule,,1996-01-01,2026-10-06,7494,7412,7479,2
 COALINDIA.NS,stock,2010-11-04,coverage rule,,2010-11-04,2026-10-06,3922,3879,3913,1
 DRREDDY.NS,stock,1997-02-04,coverage rule,,1996-01-01,2026-10-06,7326,7245,7311,0
-EICHERMOT.NS,stock,1997-03-03,coverage rule,,1996-01-01,2026-10-06,7300,7209,7286,7
+EICHERMOT.NS,stock,1997-07-21,implausible dividend,Yahoo dividend > 20% of price on 1997-07-21,1996-01-01,2026-10-06,7209,7119,7195,7
 ETERNAL.NS,stock,2021-07-23,coverage rule,,2021-07-23,2026-10-06,1282,1264,1277,0
 GRASIM.NS,stock,2002-07-01,coverage rule,,2002-07-01,2026-10-05,5989,5927,5978,0
 HCLTECH.NS,stock,2002-08-12,coverage rule,,2002-08-12,2026-10-06,5958,5894,5946,3

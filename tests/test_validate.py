@@ -57,6 +57,12 @@ def test_excursion_longer_than_max_rows_is_not_a_glitch() -> None:
     assert not validate.scale_glitches(close, max_rows=5).any()
 
 
+def test_implausible_dividend_is_judged_against_the_previous_close() -> None:
+    df = _frame([NORMAL, NORMAL, NORMAL, NORMAL]).assign(Dividends=[0.0, 9.6, 0.0, 41.0])
+    # 9.6 on 100.5 is a real (Coal India-sized) dividend; 41 is not
+    assert validate.implausible_dividend(df).tolist() == [False, False, False, True]
+
+
 def test_stale_open() -> None:
     df = _frame([NORMAL, (100.5, 101, 99, 100, 10), (100.4, 101, 99, 100, 10)])
     assert validate.stale_open(df).tolist() == [False, True, False]

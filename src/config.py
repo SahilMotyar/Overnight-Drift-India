@@ -144,6 +144,14 @@ EXTREME_NIGHT = 0.20
 # all of them (64 of 66 checked), so they are flagged, not rejected.
 REVERSED_OPEN_MIN_JUMP = 0.15
 
+# A dividend above this share of the previous close is one Yahoo never scaled
+# for later splits. Yahoo's adjustment factor (1 - D / prev Close) then wrecks
+# every adjusted price before it: ADANIENT 2002-09-04 (121% -> negative
+# prices), 2003-09-04 (88%), 2004-06-28 (52%), EICHERMOT 1997-07-21 (41%).
+# The largest real one in the data is Coal India's 9.6% (2014-01-17). Found at
+# the Phase 3 checkpoint; a series starts on its last such ex-date.
+MAX_DIVIDEND_YIELD = 0.20
+
 # A series starts after its last COVERAGE_WINDOW-session stretch with rows on
 # fewer than MIN_COVERAGE of sessions. Catches NESTLEIND's 2003-09 placeholder
 # years (-> 2010-01-08) and NIFTYBEES' 2012-13 no-trade spell.

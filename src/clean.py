@@ -99,7 +99,13 @@ def finish(
 
     rule = start_date(df.index, calendar if coverage_calendar is None else coverage_calendar)
     override = config.START_OVERRIDES.get(ticker)
-    start = max(rule, pd.Timestamp(override[0])) if override else rule
+    start, start_by, why = rule, "coverage rule", ""
+    if override and pd.Timestamp(override[0]) > start:
+        start, start_by, why = pd.Timestamp(override[0]), "override", override[1]
+    bad_dividends = df.index[validate.implausible_dividend(df)]
+    if len(bad_dividends) and bad_dividends[-1] > start:
+        start, start_by = bad_dividends[-1], "implausible dividend"
+        why = f"Yahoo dividend > {config.MAX_DIVIDEND_YIELD:.0%} of price on {bad_dividends[-1].date()}"
     df = _drop(df, df.index < start, ticker, "before series start date", log)
 
     while (glitch := validate.scale_glitches(df["Close"])).any():
@@ -128,6 +134,10 @@ def finish(
     reject(night_note, validate.extreme_night(df), "night beyond +-20%", "night")
 
     out = adjust_for_dividends(df).join(nights)
+    nonpositive = (out[validate.PRICE_COLUMNS] <= 0).any(axis=1)
+    if nonpositive.any():
+        raise ValueError(f"{ticker}: {nonpositive.sum()} dividend-adjusted price(s) <= 0 from "
+                         f"{out.index[nonpositive][0].date()}; a dividend Yahoo mis-scaled?")
     out["session_kind"] = session
     out["night_ok"] = night_note == ""
     out["night_note"] = night_note
@@ -139,8 +149,8 @@ def finish(
     summary = {
         "ticker": ticker,
         "start": start.date(),
-        "start_by": "override" if override and start > rule else "coverage rule",
-        "override_reason": override[1] if override and start > rule else "",
+        "start_by": start_by,
+        "start_reason": why,
         "first_raw": rows.index[0].date(),
         "last": out.index[-1].date(),
         "rows": len(out),

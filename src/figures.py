@@ -63,9 +63,10 @@ def _style() -> None:
 
 
 def compact(v: float) -> str:
-    """A positive number for labels: 0.075, 4.16, 55.5, 14,543, 359M."""
-    if v >= 1e6:
-        return f"{v / 1e6:,.3g}M"
+    """A positive number for labels: 0.075, 4.16, 55.5, 14,543, 359M, 18.1B."""
+    for size, suffix in ((1e12, "T"), (1e9, "B"), (1e6, "M")):
+        if v >= size:
+            return f"{v / size:,.3g}{suffix}"
     if v >= 1e3:
         return f"{v:,.0f}"
     if v >= 1:
@@ -81,13 +82,16 @@ def multiple(v: float) -> str:
 
 def times(v: float, _pos: object = None) -> str:
     """Axis tick: ÷1,000, ×0.1, ×1, ×1,000, ×100M."""
+    def big(x: float) -> str:
+        for size, suffix in ((1e12, "T"), (1e9, "B"), (1e6, "M")):
+            if x >= size * (1 - 1e-9):  # 1 / 1e-9 is 999,999,999.99...
+                return f"{x / size:.3g}{suffix}"
+        return f"{x:,.0f}"
+
     if v < 0.01:
-        inv = 1 / v
-        return f"÷{inv / 1e6:g}M" if inv >= 1e6 else f"÷{inv:,.0f}"
-    if v >= 1e6:
-        return f"×{v / 1e6:g}M"
+        return f"÷{big(1 / v)}"
     if v >= 1:
-        return f"×{v:,.0f}"
+        return f"×{big(v)}"
     return f"×{v:g}"
 
 
@@ -144,7 +148,8 @@ def growth_chart(
     _log_axis(ax)
     ax.set_xlim(curves.index[0], x_end)
     ax.legend(loc="upper left", frameon=False, labelcolor=INK_2, fontsize=8.5)
-    ax.set_ylabel("Growth of ₹1 (log scale)")
+    # no y-axis title: the title says "growth of 1", the subtitle "log scale",
+    # and wide ticks (÷10,000) would push a rotated title off the canvas
     fig.text(0.08, 0.965, title, fontsize=12, weight="semibold", color=INK, va="top")
     fig.text(0.08, 0.915, subtitle, fontsize=8.5, color=INK_2, va="top")
     if note:
@@ -181,7 +186,9 @@ def small_multiples(
     fig_h = fig.get_size_inches()[1]
     fig.text(0.015, 1 - 0.15 / fig_h, title, fontsize=12, weight="semibold", color=INK, va="top")
     fig.text(0.015, 1 - 0.45 / fig_h, subtitle, fontsize=8, color=INK_2, va="top")
-    fig.subplots_adjust(left=0.04, right=0.99, bottom=0.03, top=1 - top_in / fig_h, hspace=0.7, wspace=0.35)
+    bottom_in = 0.3  # inches for the last row's year labels, whatever the row count
+    fig.subplots_adjust(left=0.04, right=0.99, bottom=bottom_in / fig_h, top=1 - top_in / fig_h,
+                        hspace=0.7, wspace=0.35)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)
     plt.close(fig)
