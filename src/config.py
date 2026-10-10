@@ -200,6 +200,27 @@ SPOTCHECK_FROM = "1996-01-01"
 SPOTCHECK_TOLERANCE = 0.002
 
 # --------------------------------------------------------------------------
+# Decomposition (Phase 3)
+# --------------------------------------------------------------------------
+
+# Phase 2 rejects every night beyond +-20%, because a corporate action cannot
+# be told from a real move without a corporate-action database. NSE's own
+# bhavcopy shows these 7 as genuine price moves, not corporate actions
+# (reports/phase2_unusual_vs_nse.csv). They stay rejected in the main results;
+# Phase 3 reports what putting them back changes (open decision in PLAN.md).
+GENUINE_EXTREME_NIGHTS: tuple[tuple[str, str], ...] = (
+    ("EICHERMOT.NS", "1998-10-07"), ("EICHERMOT.NS", "1999-03-19"),
+    ("EICHERMOT.NS", "1999-04-01"), ("EICHERMOT.NS", "2001-07-13"),
+    ("EICHERMOT.NS", "2001-07-16"), ("ONGC.NS", "2002-05-06"),
+    ("NESTLEIND.NS", "2010-04-23"),
+)
+
+# A return smaller than this in absolute value counts as flat. Dividend
+# adjustment leaves ~1e-7 noise on what is exactly zero in raw prices (an
+# official Open equal to the previous close: ~4% of stock nights).
+FLAT_TOLERANCE = 1e-6
+
+# --------------------------------------------------------------------------
 # Subperiods (Phase 4)
 # --------------------------------------------------------------------------
 
