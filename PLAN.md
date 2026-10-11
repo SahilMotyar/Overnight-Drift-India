@@ -56,7 +56,7 @@ explains (a loss stops at zero) goes away.
 | 1 | Acquisition: indices, ETF, Nifty 50 stocks | **done** (2026-10-07; 54/54 series) |
 | 2 | Validation layer + drop table | **done** (2026-10-07; 300,282 usable nights after the Phase 3 dividend fix) |
 | 3 | Decomposition: the reel's chart on Indian data | **done** (2026-10-10) |
-| 4 | Is it real? Significance, subperiods, cross-section | not started |
+| 4 | Is it real? Significance, subperiods, cross-section | **done** (2026-10-11) |
 | 5 | Indian cost model + break-even table | not started |
 | 6 | Tradable variants, gross vs net | not started |
 | 7 | `reports/findings.md` | not started |
@@ -98,6 +98,8 @@ src/spotcheck.py   cleaned Yahoo returns vs NSE official prices
 src/decompose.py   Phase 3 night / day legs, chained curves, identity check
 src/summary.py     Phase 3 leg statistics, night kinds, sensitivity, vs-index gaps
 src/figures.py     Phase 3 charts (growth chart, small multiples)
+src/inference.py   Phase 4 Newey-West HAC t-stats, stationary block bootstrap
+src/significance.py  Phase 4 subperiod tests, equal-weight portfolio, cross-section
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -314,15 +316,58 @@ Subperiods are fixed now, before any results are seen:
 - Jul 2023 onward: SGX Nifty moved to GIFT City, so the Indian night is now
   priced live offshore
 
-Tests:
-- Mean night and day returns with Newey-West (HAC) t-stats.
-- Stationary block bootstrap CI for (night - day).
-- Cross-section across the Nifty 50 stocks: how many have night > day? Does the
-  gap scale with size, liquidity, or F&O inclusion?
-- Survivorship caveat: current constituents only. Today's Nifty 50 stocks are
-  winners. That inflates hold but biases the night/day split less. State it and
-  claim no more than that.
-- CHECKPOINT: t-stat table, bootstrap CIs, subperiod table.
+`python -m scripts.phase4_significance` (about 1 min). It writes
+`reports/phase4_tests.csv` (every series x period) and
+`reports/phase4_cross_section.csv`.
+
+Method:
+- *Means.* Night and day means get Newey-West t-stats (numpy, 10 lags
+  for ~7,600 sessions).
+- *Gap.* The gap is night - day on the same date, with both accepted. It
+  gets its own t-stat and a 95% stationary-bootstrap CI (2,000 reps, mean
+  block length about 20 sessions).
+- *Aggregate.* The stocks' headline is one test: an equal-weight portfolio
+  (each date, the mean over the stocks with that return).
+
+**Gap = night - day, bp per session (t; 95% CI):**
+
+| Period | Nifty 50 | Sensex | Nifty Bank | EW stocks |
+|---|---|---|---|---|
+| full | **13.6** (7.2; 9.3-17.6) | **23.0** (13.1) | **13.1** (5.9) | **28.4** (16.1; 24.4-32.6) |
+| pre-2011 | 0.2 (0.0; -15.7-16.8) | **24.3** (7.7) | 5.4 (0.7) | **38.7** (13.0) |
+| 2011-2019 | **17.7** (8.7) | **26.3** (13.3) | **17.3** (6.0) | **18.4** (8.9) |
+| 2020-Jun 2023 | **20.6** (4.8) | **21.8** (5.1) | **20.2** (3.3) | **23.3** (5.6) |
+| Jul 2023- | **8.1** (3.2; 3.3-13.0) | **9.5** (3.4) | 1.6 (0.5) | **14.1** (5.1) |
+
+- **The split is real.** Nifty's night averages +8.9 bp (t = 9.6) and its
+  day -4.9 bp (t = -3.0). The night is the stronger half: the day's negative
+  mean is significant in the full sample but not in every period.
+- **Across stocks** (`reports/phase4_tests.csv`):
+  - Full sample: the gap clears t > 2 for 47 of 50 stocks, and the
+    Bonferroni bar for all 250 stock tests (|t| > 3.72) for 40.
+  - No stock has a significantly negative gap or night in any period.
+  - Nights clear t > 2 for 49 of 50, while days are significantly negative
+    for only 27 of 50.
+- **The gap is shrinking.** Since Jul 2023 (GIFT Nifty), Nifty's gap is
+  8.1 bp, against 17-21 bp before. Nifty Bank's is no longer significant,
+  and only 22 of 50 stocks clear t > 2 (12 at Bonferroni). Nights are now
+  priced live offshore in GIFT City; that fits, but doesn't prove, the
+  timing.
+- **Pre-2011 Nifty shows no gap** (0.2 bp, t = 0.0, 2007-2010 only, with the
+  2008 crash). Sensex over 1997-2010 shows a strong one. The pre-auction
+  window is short and noisy for Nifty, and the stocks' early opens were first
+  trades (Phase 3). Don't read much into either.
+- **No link to liquidity.** From 2011, over 50 stocks, Spearman rho between
+  traded value and the gap is -0.16 (permutation p = 0.26). By liquidity
+  tercile, the median gap is 19.2 / 16.8 / 17.8 bp.
+- **Not tested:** size (there is no market-cap history) and F&O inclusion
+  (every current constituent is in F&O).
+- **NIFTYBEES is reported but not trusted** (gap 117 bp, t = 9.8), because
+  of its opening-price distortion (Phase 3).
+- **Survivorship:** current constituents only. That flatters buy-and-hold
+  more than the night/day split, but it is still only measured on survivors.
+- CHECKPOINT: done. Subperiod table, stock counts with a multiple-testing
+  bar, cross-section.
 
 ### Phase 5: Indian cost model
 This is where the strategy lives or dies. It trades twice a day, about 250 round
@@ -413,15 +458,13 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 
 ## Open decisions (default in bold)
 
-1. **The 7 genuine +-20% nights** (EICHERMOT x5 1998-2001, ONGC 2002-05-06,
-   NESTLEIND 2010-04-23). NSE confirms each as a real price move, but the +-20%
-   rule rejects them along with the corporate actions. For EICHERMOT alone,
-   rejecting them lowers the mean night by about 1.4 bp. Measured in Phase 3:
-   restoring them moves EICHERMOT from 19.8 to 21.3 bp, ONGC from 21.6 to
-   21.8 bp and NESTLEIND from 12.2 to 11.7 bp. It does not move the median
-   stock at all. Options:
-   **keep them rejected and report the sensitivity in Phase 3**, or reinstate
-   these 7 by name.
+1. **What to cost in Phase 5/6**, given NIFTYBEES's unreliable opening
+   price. Options:
+   - **The EW stock basket and the Nifty index as the benchmark, with the ETF
+     run separately and flagged**
+   - check whether NIFTYBEES's official open is a price you could trade at
+     size (NSE trade-level data would be needed)
+   - index futures (the NSE F&O bhavcopy would be needed)
 
 ## Decisions logged as they are made
 
@@ -488,3 +531,16 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
     checks pass, CVD dE 24.7). Every chart was rendered and looked at; fixes
     from that are in the commit (scientific notation -> divisions, clipped
     year labels and y title, axis padding beyond the data).
+- **Phase 4 (2026-10-11).**
+  - The 7 genuine +-20% nights stay rejected (user decision, 2026-10-11).
+  - HAC and bootstrap are written in numpy (`src/inference.py`) and tested
+    against known answers: AR(1) long-run variance, an exact rotation for an
+    endless block, block = 1 equal to the iid bootstrap.
+  - Each CI draws from a fresh `rng("bootstrap")`, so every test reproduces
+    on its own; the cross-section uses its own stream, `"crosssection"`.
+  - Multiple testing: 250 stock tests, so stock counts are reported at both
+    |t| > 2 and the Bonferroni bar (3.72). The headline stock result is the
+    single equal-weight portfolio test.
+  - The cross-section runs from 2011 only (every stock's open set by the
+    pre-open auction), on stocks with >= 3 years in that window. Liquidity is
+    the median Close x Volume, where Yahoo's split adjustment cancels.

@@ -29,6 +29,7 @@ _STREAMS: tuple[str, ...] = (
     "bootstrap",
     "test",
     "spotcheck",
+    "crosssection",
 )
 
 _STREAM_SEQS = dict(zip(_STREAMS, _ROOT_SEQ.spawn(len(_STREAMS))))
@@ -227,6 +228,23 @@ GENUINE_EXTREME_NIGHTS: tuple[tuple[str, str], ...] = (
 # adjustment leaves ~1e-7 noise on what is exactly zero in raw prices (an
 # official Open equal to the previous close: ~4% of stock nights).
 FLAT_TOLERANCE = 1e-6
+
+# --------------------------------------------------------------------------
+# Inference (Phase 4)
+# --------------------------------------------------------------------------
+
+BOOTSTRAP_REPS = 2000
+CI_LEVEL = 0.95
+
+# A period is tested only with at least this many accepted returns (~1 year).
+MIN_TEST_SESSIONS = 250
+
+# Cross-section: stocks are compared on a common window after NSE's pre-open
+# call auction (late 2010), when every stock's open is set the same way, and
+# need at least this many years in it.
+CROSS_SECTION_FROM = "2011-01-01"
+CROSS_SECTION_MIN_YEARS = 3.0
+PERMUTATIONS = 10_000
 
 # --------------------------------------------------------------------------
 # Subperiods (Phase 4)
