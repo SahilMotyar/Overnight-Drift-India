@@ -57,7 +57,7 @@ explains (a loss stops at zero) goes away.
 | 2 | Validation layer + drop table | **done** (2026-10-07; 300,282 usable nights after the Phase 3 dividend fix) |
 | 3 | Decomposition: the reel's chart on Indian data | **done** (2026-10-10) |
 | 4 | Is it real? Significance, subperiods, cross-section | **done** (2026-10-11) |
-| 5 | Indian cost model + break-even table | not started |
+| 5 | Indian cost model + break-even table | **done** (2026-10-12) |
 | 6 | Tradable variants, gross vs net | not started |
 | 7 | `reports/findings.md` | not started |
 
@@ -100,6 +100,8 @@ src/summary.py     Phase 3 leg statistics, night kinds, sensitivity, vs-index ga
 src/figures.py     Phase 3 charts (growth chart, small multiples)
 src/inference.py   Phase 4 Newey-West HAC t-stats, stationary block bootstrap
 src/significance.py  Phase 4 subperiod tests, equal-weight portfolio, cross-section
+src/costs.py       Phase 5 round-trip cost by component, futures carry
+src/breakeven.py   Phase 5 strategy returns and break-even cost solvers
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -370,33 +372,73 @@ Method:
   bar, cross-section.
 
 ### Phase 5: Indian cost model
-This is where the strategy lives or dies. It trades twice a day, about 250 round
-trips a year, so a 0.25% round-trip cost is roughly 60% a year of drag.
+`python -m scripts.phase5_costs`. It writes `reports/phase5_costs.csv` (cost
+by component) and `reports/phase5_breakeven.csv` (every series x strategy x
+period).
 
-Each component is a parameter in `config.py`. Check every rate against current
-NSE, SEBI and broker schedules when implementing, because they change (F&O STT
-changed in Oct 2024).
+**Rates** were checked 2026-10-12 against Zerodha's live charges page and
+NSE's FY2026-27 STT circular, and every one is in `config.py`:
 
-- **STT depends on trade type:**
-  - Close -> open is a *delivery* trade (held overnight): about 0.1% on both buy
-    and sell for stocks.
-  - Open -> close is intraday: about 0.025%, sell side only.
-  - ETF units: much lower, sell side (verify).
-  - Futures: sell side only.
-- **Other charges:**
-  - stamp duty (buy side)
-  - exchange transaction charge
-  - SEBI fee
-  - GST on brokerage and exchange charges
-  - brokerage (zero for delivery at many discount brokers)
-  - DP charge per stock per sell day. It's a flat amount, so it hits small
-    accounts hardest, and brokers differ on whether BTST sells pay it.
-- **Slippage:** half-spread at the open auction, plus the close mechanics
-  (Phase 6).
-- Output: a **break-even table** with, per instrument, the round-trip cost at
-  which the night strategy's net return equals buy-and-hold, next to the
-  estimated real cost.
-- CHECKPOINT: break-even table.
+| Charge | Stock overnight (delivery) | Stock intraday | ETF overnight | Index futures |
+|---|---|---|---|---|
+| STT | 0.1% buy + 0.1% sell | 0.025% sell | 0.001% sell | **0.05% sell** (up from 0.02% on 2026-04-01) |
+| Stamp duty (buy) | 0.015% | 0.003% | 0.015% | 0.002% |
+
+All four also pay:
+- NSE transaction charge: 0.00307% (0.00183% for F&O)
+- SEBI fee: Rs 10/crore
+- GST: 18% of brokerage + exchange + SEBI
+- brokerage: min(0.03%, Rs 20) per intraday / F&O order, nothing on delivery
+- DP charge: Rs 15.34 per stock per sell day, on delivery
+
+Slippage is an assumed 2 bp a side (1 bp for futures). Index futures also
+give up about 5%/yr carry over each night's hours.
+
+**Round-trip cost:**
+
+| Trade | Rs per order | Round trip |
+|---|---|---|
+| Stock overnight | 1 lakh | **27.8 bp** (20 of it STT) |
+| Stock intraday | 1 lakh | 12.3 bp |
+| ETF overnight | 1 lakh | 7.9 bp |
+| Index futures | ~15 lakh, one lot | 8.0 bp |
+
+**Break-even** (the round-trip cost at which net CAGR = 0) against the
+estimated cost, in bp:
+
+| Series, trade | Full: gross / break-even / cost -> net CAGR | Jul 2023 on: gross / break-even -> net CAGR |
+|---|---|---|
+| Nifty, long night (futures) | 7.3 / 7.1 / 8.0 -> **-2.1%** | 3.8 / 3.7 -> **-10.0%** |
+| Nifty, short day (futures) | 5.3 / 4.6 / 8.0 -> -7.9% | 3.4 / 3.2 -> -11.0% |
+| Sensex, long night (futures) | 12.2 / 11.9 / 8.0 -> +10.0% | 4.3 / 4.1 -> -9.0% |
+| EW stocks, long night (delivery) | 19.9 / 19.6 / 27.8 -> **-18.2%** | 10.4 / 10.3 -> **-34.8%** |
+| EW stocks, short day (intraday) | 8.5 / 7.8 / 12.3 -> -10.5% | 4.1 / 3.8 -> -18.7% |
+| NIFTYBEES, long night | 63.4 / 61.1 / 7.9 -> +264% (not real, see below) | 45.4 / 45.0 -> +145% |
+
+- **Nothing you can trust survives today's costs.** Since Jul 2023 the
+  Nifty night earns 3.8 bp per round trip after futures carry, but the
+  futures STT alone is 5 bp. Nifty fails even with zero slippage (-5.5%/yr).
+- **Stocks:** delivery STT (20 bp) is more than the median stock's whole
+  night edge (17.3 bp full, 8.4 bp since Jul 2023). Only 2 of 50 stocks
+  have a positive net CAGR over the full sample, and 0 of 50 since Jul 2023.
+  The short day keeps 5 of 50 alive, but none beats doing nothing by much.
+- **The only full-sample survivor is Sensex**, at +10.0%/yr against 9.2%
+  buy-and-hold. That comes from its 1997-2010 years; since Jul 2023 it is
+  -9.0%.
+- **Today's costs are applied to every period.** The question is "could you
+  trade this today?", not what traders paid in 2005.
+- **NIFTYBEES looks hugely profitable but is the Phase 3 opening-price
+  distortion.** Its official open sits far above where the index opens. Whether
+  you could sell at that open in size is untested: NSE's daily files don't
+  show opening-auction volume. Don't treat it as a result.
+- **Not in these numbers:**
+  - income tax (intraday counts as speculative business income; overnight
+    gains as short-term capital gains)
+  - interest on idle cash
+  - margin
+  - the price impact of trading in the auction
+- CHECKPOINT: done. Cost table, break-even table, stock survival counts,
+  slippage sensitivity.
 
 ### Phase 6: Tradable variants
 - **S0** buy-and-hold (benchmark).
@@ -458,13 +500,15 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 
 ## Open decisions (default in bold)
 
-1. **What to cost in Phase 5/6**, given NIFTYBEES's unreliable opening
-   price. Options:
-   - **The EW stock basket and the Nifty index as the benchmark, with the ETF
-     run separately and flagged**
-   - check whether NIFTYBEES's official open is a price you could trade at
-     size (NSE trade-level data would be needed)
-   - index futures (the NSE F&O bhavcopy would be needed)
+1. **What Phase 6 should be**, now that Phase 5 shows nothing trustworthy
+   survives costs. Options:
+   - **S4 first: the zero-cost timing tilt** (a monthly SIP buying at the
+     close instead of the open, which is what the pattern is worth to a
+     long-term investor), **plus net equity curves for S1-S3 as the record of
+     why they fail**
+   - all of S1-S5 as originally planned (S5 = actual Nifty futures prices,
+     which needs NSE F&O bhavcopies)
+   - stop after S4 and go straight to the Phase 7 findings
 
 ## Decisions logged as they are made
 
@@ -544,3 +588,17 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
   - The cross-section runs from 2011 only (every stock's open set by the
     pre-open auction), on stocks with >= 3 years in that window. Liquidity is
     the median Close x Volume, where Yahoo's split adjustment cancels.
+- **Phase 5 (2026-10-12).**
+  - What to cost: the default was used (EW stock basket and the indices via
+    futures, ETF run but flagged); the user didn't pick otherwise.
+  - Rates from Zerodha's live charges page plus NSE's FY2026-27 STT circular
+    (ETF delivery STT 0.001% sell-only; futures STT 0.05% since 2026-04-01).
+    Each rate is in config with the date it was checked.
+  - Indices are costed as futures, with the carry a long gives up overnight
+    (~5%/yr x the night's hours) netted into the gross return rather than
+    counted as a fee. Futures prices themselves aren't used (no F&O data); the
+    index night stands in for the futures night.
+  - Break-even is reported three ways: mean, CAGR = 0, and CAGR = buy-and-hold
+    (long night only). Today's costs are applied to all periods.
+  - DP charge is included for BTST sells (the conservative case: 1.5 bp per
+    Rs 1 lakh).
