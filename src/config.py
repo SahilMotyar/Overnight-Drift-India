@@ -247,6 +247,66 @@ CROSS_SECTION_MIN_YEARS = 3.0
 PERMUTATIONS = 10_000
 
 # --------------------------------------------------------------------------
+# Trading costs (Phase 5)
+# --------------------------------------------------------------------------
+
+# Statutory and exchange rates as fractions of traded value, checked on
+# 2026-10-12 against Zerodha's charges page (live) and NSE's STT circular for
+# FY2026-27. They change (futures STT went 0.0125% -> 0.02% -> 0.05% between
+# Oct 2024 and Apr 2026), so re-check before relying on a result.
+COST_SOURCES: tuple[str, ...] = (
+    "https://zerodha.com/charges",
+    "https://nsearchives.nseindia.com/content/circulars/FATAX73524.pdf",
+)
+COST_RATES_CHECKED = "2026-10-12"
+GST = 0.18             # on brokerage + exchange charges + SEBI fee
+SEBI_FEE = 10 / 1e7    # Rs 10 per crore, both sides
+# NSE's IPFT levy (Rs 0.01 per crore) is ~1e-9 of value and left out.
+
+# Per trade type. "delivery" = held overnight (a buy-today-sell-tomorrow
+# trade still pays delivery STT on both legs); "intraday" = opened and closed
+# the same session. Brokerage is a discount broker's: min(pct x value, cap) per
+# order. DP = the depository charge per stock per day it is sold out of demat
+# (Rs 15.34 incl. GST); it may not apply to every BTST sale, so this is the
+# conservative case.
+TRADE_TYPES: dict[str, dict[str, float]] = {
+    "stock_delivery": {"stt_buy": 0.001, "stt_sell": 0.001, "stamp_buy": 0.00015,
+                       "exchange": 0.0000307, "brokerage_pct": 0.0, "brokerage_cap": 0.0, "dp_per_sell": 15.34},
+    "stock_intraday": {"stt_buy": 0.0, "stt_sell": 0.00025, "stamp_buy": 0.00003,
+                       "exchange": 0.0000307, "brokerage_pct": 0.0003, "brokerage_cap": 20.0, "dp_per_sell": 0.0},
+    "etf_delivery": {"stt_buy": 0.0, "stt_sell": 0.00001, "stamp_buy": 0.00015,
+                     "exchange": 0.0000307, "brokerage_pct": 0.0, "brokerage_cap": 0.0, "dp_per_sell": 15.34},
+    "etf_intraday": {"stt_buy": 0.0, "stt_sell": 0.00025, "stamp_buy": 0.00003,
+                     "exchange": 0.0000307, "brokerage_pct": 0.0003, "brokerage_cap": 20.0, "dp_per_sell": 0.0},
+    "index_futures": {"stt_buy": 0.0, "stt_sell": 0.0005, "stamp_buy": 0.00002,
+                      "exchange": 0.0000183, "brokerage_pct": 0.0003, "brokerage_cap": 20.0, "dp_per_sell": 0.0},
+}
+
+# Rupee value of one order, which sets how much the fixed fees (Rs 20
+# brokerage cap, Rs 15.34 DP) weigh. A Nifty futures lot is ~Rs 15 lakh.
+ORDER_VALUE_INR: dict[str, float] = {
+    "stock_delivery": 100_000, "stock_intraday": 100_000,
+    "etf_delivery": 100_000, "etf_intraday": 100_000,
+    "index_futures": 1_500_000,
+}
+
+# Slippage per side, bp: an assumption, not a quote. The open is the pre-open
+# auction price (achievable); the official close is a 30-minute VWAP, which a
+# VWAP order only approximates. Phase 5 reports break-even costs, so any other
+# slippage can be checked against them.
+SLIPPAGE_BP_PER_SIDE: dict[str, float] = {
+    "stock_delivery": 2.0, "stock_intraday": 2.0,
+    "etf_delivery": 2.0, "etf_intraday": 2.0,
+    "index_futures": 1.0,
+}
+
+# A futures price decays towards spot at the cost of carry (interest minus
+# dividend yield, ~6.3% - 1.3%). A long held overnight gives that up for the
+# hours the night lasts; a short held through the day earns it for 6.25 h.
+FUTURES_CARRY_ANNUAL = 0.05
+SESSION_HOURS = 6.25  # 09:15-15:30
+
+# --------------------------------------------------------------------------
 # Subperiods (Phase 4)
 # --------------------------------------------------------------------------
 
