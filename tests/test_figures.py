@@ -42,6 +42,14 @@ def test_charts_render(tmp_path) -> None:
     assert q.exists() and q.stat().st_size > 10_000
 
 
+def test_strategy_panels_render(tmp_path) -> None:
+    c = decompose.curves(_clean())
+    eq = pd.DataFrame({"S0 hold": c["hold"], "S1 long night": c["night"],
+                       "S2 short day": 1 / c["day"], "S3 both": c["night"] / c["day"]})
+    p = figures.strategy_panels({"A": eq, "B": eq}, tmp_path / "s.png", "Title", "Subtitle")
+    assert p.exists() and p.stat().st_size > 10_000
+
+
 def test_growth_chart_survives_a_flat_leg(tmp_path) -> None:
     c = decompose.curves(_clean())
     c["day"] = 1.0
