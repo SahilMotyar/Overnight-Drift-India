@@ -58,7 +58,7 @@ explains (a loss stops at zero) goes away.
 | 3 | Decomposition: the reel's chart on Indian data | **done** (2026-10-10) |
 | 4 | Is it real? Significance, subperiods, cross-section | **done** (2026-10-11) |
 | 5 | Indian cost model + break-even table | **done** (2026-10-12) |
-| 6 | Tradable variants, gross vs net | not started |
+| 6 | Tradable variants, gross vs net | **done** (2026-10-13) |
 | 7 | `reports/findings.md` | not started |
 
 Each phase ends at a CHECKPOINT: print that phase's diagnostics, stop, wait.
@@ -102,6 +102,7 @@ src/inference.py   Phase 4 Newey-West HAC t-stats, stationary block bootstrap
 src/significance.py  Phase 4 subperiod tests, equal-weight portfolio, cross-section
 src/costs.py       Phase 5 round-trip cost by component, futures carry
 src/breakeven.py   Phase 5 strategy returns and break-even cost solvers
+src/backtest.py    Phase 6 S0-S3 equity curves (gross / net), stats, SIP timing
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -441,28 +442,63 @@ estimated cost, in bp:
   slippage sensitivity.
 
 ### Phase 6: Tradable variants
-- **S0** buy-and-hold (benchmark).
-- **S1** long night: buy at close, sell at the next open. In India this is a
-  BTST trade. Under T+1 you sell before the shares are delivered, which carries
-  short-delivery/auction risk if the counterparty fails.
-- **S2** short day: short at open, cover at close. Intraday cash shorting (MIS)
-  is allowed, and STT is lower than for S1.
-- **S3** S1 + S2 combined.
-- **S4** execution-timing tilt, with no extra trades: a monthly SIP that buys at
-  the close instead of the open. This measures what the pattern is worth to a
-  long-term investor at zero added cost, and is probably the most practical
-  takeaway.
-- **S5** (optional) Nifty futures. Futures open/close data needs NSE's F&O
-  bhavcopy because yfinance doesn't have it. Only worth doing if Phase 5 shows
-  the ETF and stock versions die on costs and futures might not.
+`python -m scripts.phase6_backtest`. It writes `reports/phase6_strategies.csv`,
+`reports/phase6_sip.csv` and `reports/figures/phase6_net_equity.png`.
 
-Execution realism:
-- *Open:* NSE's opening price is set by the 09:00-09:08 pre-open call auction.
-  An order can take part in it, so the open is achievable.
-- *Close:* NSE's official close for stocks is the volume-weighted average of the
-  last 30 minutes, not a single price you can trade at. A VWAP order over
-  15:00-15:30 gets close to it. Model the leftover gap as slippage.
-- CHECKPOINT: gross vs net equity curves, Sharpe ratio, max drawdown, turnover.
+The strategies:
+- **S0** buy-and-hold (close to close).
+- **S1** long night.
+- **S2** short day.
+- **S3** both, which is two round trips a day.
+
+Each is shown gross and net of the Phase 5 costs (indices via futures, stocks
+in cash). **S4** is a monthly SIP on the first trusted session of each
+month, bought at that open, at that close, or at the next session's open.
+
+**S0-S3**, CAGR gross -> net (net max drawdown):
+
+| Series | S0 hold | S1 long night | S2 short day | S3 both |
+|---|---|---|---|---|
+| Nifty (2007-) | 8.2% | 18.6% -> **-2.1%** (-55%) | 11.8% -> -7.9% (-85%) | 32.6% -> -9.9% (-87%) |
+| EW stocks (1996-) | 26.2% | 61.3% -> **-18.2%** (-99.9%) | 21.1% -> -10.5% (-98%) | 95.4% -> -26.8% (-99.99%) |
+| Nifty, Jul 2023- | 5.8% | 9.3% -> -10.0% | 8.3% -> -11.0% | 18.4% -> -19.9% |
+
+- **Before costs** S1 is the best risk-adjusted strategy: Nifty return/vol 1.98
+  vs 0.50 for buy-and-hold, with less than half its drawdown (-27% vs -63%).
+- **After costs**, with about 240 round trips a year, every variant loses money
+  and loses to doing nothing (the chart). S3 is worst because it pays twice
+  a day.
+- The one exception is Sensex S1/S3 over the full sample (+10.0% / +12.0% vs
+  9.2% hold), from its 1997-2010 years; since Jul 2023 it is -9.0% / -17.0%.
+
+**S4, the free part.** Buying at the close instead of the next morning's open
+(an order placed after the close, such as an after-market order):
+
+| | Saving per instalment | Final SIP value |
+|---|---|---|
+| Nifty | 13.4 bp | +0.12% |
+| Nifty Bank | 15.3 bp | +0.13% |
+| Sensex | 17.3 bp | +0.16% |
+| Stocks (median) | 24.1 bp | +0.23% |
+
+The close wins for 45 of 50 stocks.
+
+- **Against that same morning's open it is a coin-flip.** The close wins for
+  19 of 50 stocks; Nifty saves 2.1 bp per instalment, +0.04% final value.
+  For stocks, the median saving per instalment is +5.0 bp, yet the median
+  final value is -0.06%, because final value weights early instalments far
+  more.
+- **The practical rule is narrow:** don't let a buy order wait overnight for
+  the next open. Index funds already buy at the close (same-day NAV), so
+  this matters for direct-equity orders.
+- **Not done: S5, real futures prices** (it needs NSE F&O bhavcopies). With
+  the futures STT alone (5 bp) above Nifty's whole night edge since Jul 2023,
+  the answer can't change sign.
+- **Execution realism**, as planned: the open is the pre-open auction price
+  (achievable). The close is a 30-minute VWAP (approximated by a VWAP order,
+  costed as slippage).
+- CHECKPOINT: done. Gross vs net table, return/vol, max drawdown, turnover,
+  net equity chart, SIP timing table.
 
 ### Phase 7: Findings
 `reports/findings.md` with the headline numbers, the chart, what survived costs,
@@ -500,15 +536,8 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 
 ## Open decisions (default in bold)
 
-1. **What Phase 6 should be**, now that Phase 5 shows nothing trustworthy
-   survives costs. Options:
-   - **S4 first: the zero-cost timing tilt** (a monthly SIP buying at the
-     close instead of the open, which is what the pattern is worth to a
-     long-term investor), **plus net equity curves for S1-S3 as the record of
-     why they fail**
-   - all of S1-S5 as originally planned (S5 = actual Nifty futures prices,
-     which needs NSE F&O bhavcopies)
-   - stop after S4 and go straight to the Phase 7 findings
+- *(none open)*. Phase 7 writes `reports/findings.md` from what is already
+  in `reports/`.
 
 ## Decisions logged as they are made
 
@@ -602,3 +631,17 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
     (long night only). Today's costs are applied to all periods.
   - DP charge is included for BTST sells (the conservative case: 1.5 bp per
     Rs 1 lakh).
+- **Phase 6 (2026-10-13).**
+  - Scope: the Phase 5 default. That means S4 plus net curves for S1-S3,
+    without S5 (no F&O data, and it can't change sign). The user didn't pick
+    otherwise.
+  - S3 = S1 then S2 every session, charged both round trips.
+  - Return/vol uses a risk-free rate of 0, so it compares strategies with each
+    other rather than with a deposit.
+  - SIP dates: the first session of each month whose open, close and next
+    open are all trusted. All three timings use the same dates, so only the
+    timing differs.
+  - Chart: blue/orange/aqua plus gray, validated. Aqua is 2.74:1 on the
+    surface, so every line has an end label and the subtitle points to the
+    CSV. The label rule was relaxed to 1.35x for these tall panels, and the
+    legend moved to its own row so it can't hit the title.

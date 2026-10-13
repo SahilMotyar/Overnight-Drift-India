@@ -161,6 +161,52 @@ def growth_chart(
     return path
 
 
+AQUA = "#1baf7a"  # categorical slot 3: 2.74:1 on the surface, so end labels + a table view carry it
+STRATEGY_SERIES: tuple[tuple[str, str, str], ...] = (
+    ("S0 hold", "Buy and hold", MUTED),
+    ("S1 long night", "Long night", NIGHT),
+    ("S2 short day", "Short day", DAY),
+    ("S3 both", "Both", AQUA),
+)
+
+
+def strategy_panels(
+    panels: dict[str, pd.DataFrame], path: Path, title: str, subtitle: str
+) -> Path:
+    """Equity curves of S0-S3 side by side, one panel per series, each on its own log scale."""
+    _style()
+    n = len(panels)
+    fig, axes = plt.subplots(1, n, figsize=(4.6 * n, 4.4), squeeze=False)
+    for ax, (name, eq) in zip(axes.flat, panels.items()):
+        x_end = eq.index[-1]
+        ends = {k: float(eq[k].iloc[-1]) for k, _, _ in STRATEGY_SERIES}
+        # 4 series over ~1.5-6 decades in a tall panel: a 1.35x gap is ~50 px, room for a label
+        show = labels_that_fit(ends, min_ratio=1.35)
+        for key, label, color in STRATEGY_SERIES:
+            ax.plot(eq.index, eq[key], color=color, linewidth=1.4, label=label,
+                    solid_joinstyle="round", solid_capstyle="round", zorder=3)
+            ax.scatter([x_end], [ends[key]], s=24, color=color, edgecolors=SURFACE,
+                       linewidths=1.5, zorder=4, clip_on=False)
+            if key in show:
+                ax.annotate(f"{label} {multiple(ends[key])}", (x_end, ends[key]), xytext=(6, 0),
+                            textcoords="offset points", va="center", color=INK_2, fontsize=7.5,
+                            annotation_clip=False)
+        _log_axis(ax, numticks=6)
+        ax.set_xlim(eq.index[0], x_end)
+        ax.set_title(name, loc="left", fontsize=9.5, color=INK, pad=8)
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    # its own row under the subtitle, so a long title never runs into it
+    fig.legend(handles, labels, loc="upper left", bbox_to_anchor=(0.012, 0.875), frameon=False,
+               ncol=4, labelcolor=INK_2, fontsize=8)
+    fig.text(0.02, 0.97, title, fontsize=12, weight="semibold", color=INK, va="top")
+    fig.text(0.02, 0.905, subtitle, fontsize=8, color=INK_2, va="top")
+    fig.subplots_adjust(left=0.06, right=0.87, top=0.76, bottom=0.08, wspace=0.55)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path)
+    plt.close(fig)
+    return path
+
+
 def small_multiples(
     panels: dict[str, pd.DataFrame], path: Path, title: str, subtitle: str, ncols: int = 5
 ) -> Path:
