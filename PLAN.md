@@ -59,7 +59,7 @@ explains (a loss stops at zero) goes away.
 | 4 | Is it real? Significance, subperiods, cross-section | **done** (2026-10-11) |
 | 5 | Indian cost model + break-even table | **done** (2026-10-12) |
 | 6 | Tradable variants, gross vs net | **done** (2026-10-13) |
-| 7 | `reports/findings.md` | not started |
+| 7 | `reports/findings.md` | **done** (2026-10-17) |
 
 Each phase ends at a CHECKPOINT: print that phase's diagnostics, stop, wait.
 
@@ -103,6 +103,10 @@ src/significance.py  Phase 4 subperiod tests, equal-weight portfolio, cross-sect
 src/costs.py       Phase 5 round-trip cost by component, futures carry
 src/breakeven.py   Phase 5 strategy returns and break-even cost solvers
 src/backtest.py    Phase 6 S0-S3 equity curves (gross / net), stats, SIP timing
+src/findings.py    Phase 7 headline numbers from the reports; strict template renderer
+scripts/reproduce.py   reruns Phases 2-7 in order from the Phase 1 cache
+reports/findings.md    the write-up (generated from findings.template.md)
+README.md          the repo's front page; results live in findings.md
 src/validate.py    data checks + drop table
 src/decompose.py   night/day/hold series, summary stats
 src/stats.py       Newey-West t-stats, block bootstrap, subperiods
@@ -501,8 +505,29 @@ The close wins for 45 of 50 stocks.
   net equity chart, SIP timing table.
 
 ### Phase 7: Findings
-`reports/findings.md` with the headline numbers, the chart, what survived costs,
-what didn't, and the caveats.
+`python -m scripts.phase7_findings` renders
+[`reports/findings.md`](reports/findings.md) from
+`reports/findings.template.md`.
+
+- *Where the numbers come from.* Results are filled in from the Phase 2-6
+  CSVs, and method settings (tolerances, carry, slippage) from `config.py`.
+  `src.findings.render` fails if the template asks for a number it doesn't
+  have, or leaves one unused, so a rerun can't leave typed numbers stale. A
+  test fails if the committed `findings.md` differs from a fresh render.
+- *Contents.*
+  - the short answer and what was measured
+  - the split, its significance, costs, and the free SIP rule
+  - "things that looked like findings and weren't"
+  - caveats, and how to reproduce
+- *Chart.* `reports/figures/phase7_edge_vs_cost.png` shows each trade's gross
+  edge per round trip by period against today's cost. Its title is derived
+  from the data: only Nifty's overnight trade, in 2011-2019 and 2020-Jun
+  2023, cleared it.
+- `python -m scripts.reproduce` reruns Phases 2-7. `README.md` is the front
+  page and quotes no results, so nothing in it can go stale.
+- CHECKPOINT: done. The write-up was read end to end, and wording fixed:
+  double negatives, an overclaim about Sensex, the sign of the carry
+  adjustment, and numbers that had been typed in by hand.
 
 ---
 
@@ -536,8 +561,19 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
 
 ## Open decisions (default in bold)
 
-- *(none open)*. Phase 7 writes `reports/findings.md` from what is already
-  in `reports/`.
+- *(none open)*. All seven phases are done.
+
+## Possible next steps (not planned)
+
+1. **NIFTYBEES's open.** Can anyone actually sell at its official opening
+   price in size? This needs NSE pre-open auction or trade-level data.
+2. **Sensex vs Nifty.** Sensex's night is consistently larger than Nifty's
+   (2011-2019: 14.8 vs 10.6 bp). Check how BSE sets the index's opening value
+   against BSE's own files.
+3. **Real futures prices.** Use NSE F&O bhavcopies instead of index night less
+   carry. This can't change the sign since Jul 2023, but it would firm up
+   2011-2023.
+4. **Point-in-time constituents,** to remove the survivorship caveat.
 
 ## Decisions logged as they are made
 
@@ -645,3 +681,16 @@ These 5 pull in 32 transitive packages; all 37 are pinned with hashes in
     surface, so every line has an end label and the subtitle points to the
     CSV. The label rule was relaxed to 1.35x for these tall panels, and the
     legend moved to its own row so it can't hit the title.
+- **Phase 7 (2026-10-17).**
+  - findings.md is generated, not hand-written: 114 numbers from the
+    reports and config, a strict renderer, and a staleness test. The
+    one-off numbers that live in no report (e.g. a dividend at "121% of the
+    price") were reworded rather than hard-coded.
+  - It is written for someone reading the repo, so it uses plain terms and
+    explains each statistic where it first appears. The audience is
+    technically literate but not assumed to know Indian market mechanics.
+  - The edge-vs-cost chart reuses the validated blue/orange pair. Value
+    labels step past the cost line rather than collide with it, and the
+    title comes from which bars clear the line.
+  - README.md quotes no results (findings.md has them), so it can't go
+    stale.
