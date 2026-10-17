@@ -207,6 +207,66 @@ def strategy_panels(
     return path
 
 
+def edge_vs_cost(
+    rows: pd.DataFrame, path: Path, title: str, subtitle: str, ncols: int = 2
+) -> Path:
+    """Gross edge per round trip by period (bars) against today's cost (a reference line).
+
+    ``rows`` has columns ``panel``, ``period``, ``edge_bp`` and ``cost_bp``,
+    one row per bar, periods in reading order. One x scale for every panel, so
+    the panels compare.
+    """
+    _style()
+    panels = list(dict.fromkeys(rows["panel"]))
+    nrows = math.ceil(len(panels) / ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.4 * ncols, 2.1 * nrows + 1.0), squeeze=False)
+    lo = min(0.0, float(rows["edge_bp"].min()))
+    hi = float(max(rows["edge_bp"].max(), rows["cost_bp"].max()))
+    pad = 0.08 * (hi - lo)
+    for ax, name in zip(axes.flat, panels):
+        g = rows[rows["panel"] == name].reset_index(drop=True)
+        y = list(range(len(g)))[::-1]  # first period on top
+        ax.barh(y, g["edge_bp"], height=0.55, color=NIGHT, zorder=3, label="Gross edge per round trip")
+        cost = float(g["cost_bp"].iloc[0])
+        ax.axvline(cost, color=DAY, linewidth=2, zorder=4, label="Today's cost per round trip")
+        ax.axvline(0, color=AXIS, linewidth=0.8, zorder=2)
+        for yi, v in zip(y, g["edge_bp"]):
+            # a label at the bar end would run into the cost line just past it, or (for a
+            # negative bar) into the period names on the left: move it right of either
+            if v < 0:
+                at = 0.0
+            elif v < cost and cost - v < 0.09 * (hi - lo):
+                at = cost
+            else:
+                at = v
+            ax.annotate(f"{v:.1f}".replace("-", "−"), (at, yi), xytext=(4, 0), textcoords="offset points",
+                        ha="left", va="center", color=INK_2, fontsize=7.5)
+        ax.annotate(f"cost {cost:.1f}", (cost, len(g) - 0.45), xytext=(4, 0), textcoords="offset points",
+                    va="bottom", color=INK_2, fontsize=7.5, annotation_clip=False)
+        ax.set_yticks(y)
+        ax.set_yticklabels(g["period"], fontsize=8, color=INK_2)
+        ax.set_xlim(lo - pad, hi + 3 * pad)
+        ax.set_ylim(-0.6, len(g) - 0.1)
+        ax.grid(axis="y", visible=False)
+        ax.tick_params(length=0, labelsize=7.5)
+        ax.set_title(name, loc="left", fontsize=9.5, color=INK, pad=14)
+    for ax in list(axes.flat)[len(panels):]:
+        ax.set_visible(False)
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    order = sorted(range(len(labels)), key=lambda i: not labels[i].startswith("Gross"))  # bars first
+    fig_h = fig.get_size_inches()[1]
+    fig.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper left",
+               bbox_to_anchor=(0.012, 1 - 0.6 / fig_h), frameon=False, ncol=2, labelcolor=INK_2, fontsize=8)
+    fig.text(0.02, 1 - 0.12 / fig_h, title, fontsize=12, weight="semibold", color=INK, va="top")
+    fig.text(0.02, 1 - 0.4 / fig_h, subtitle, fontsize=8, color=INK_2, va="top")
+    fig.subplots_adjust(left=0.13, right=0.97, top=1 - 1.35 / fig_h, bottom=0.35 / fig_h,
+                        hspace=0.75, wspace=0.45)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path)
+    plt.close(fig)
+    return path
+
+
 def small_multiples(
     panels: dict[str, pd.DataFrame], path: Path, title: str, subtitle: str, ncols: int = 5
 ) -> Path:

@@ -50,6 +50,17 @@ def test_strategy_panels_render(tmp_path) -> None:
     assert p.exists() and p.stat().st_size > 10_000
 
 
+def test_edge_vs_cost_renders_with_a_negative_edge(tmp_path) -> None:
+    rows = pd.DataFrame({
+        "panel": ["A", "A", "B", "B"],
+        "period": ["early", "late", "early", "late"],
+        "edge_bp": [8.9, -2.2, 26.9, 10.4],
+        "cost_bp": [8.0, 8.0, 27.8, 27.8],
+    })
+    p = figures.edge_vs_cost(rows, tmp_path / "e.png", "Title", "Subtitle")
+    assert p.exists() and p.stat().st_size > 10_000
+
+
 def test_growth_chart_survives_a_flat_leg(tmp_path) -> None:
     c = decompose.curves(_clean())
     c["day"] = 1.0
