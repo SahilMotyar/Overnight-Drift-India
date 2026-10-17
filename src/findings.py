@@ -113,6 +113,13 @@ def headline(r: dict[str, pd.DataFrame], clean_dir: Path = config.DATA_CLEAN) ->
     kind_of = {t: k for t, (_, k) in instruments().items()}
     stocks = [t for t in kind_of if kind_of[t] == "stock"]
 
+    # Method constants the prose quotes (from config, not typed) ------------
+    v["spot_tolerance"] = f"{100 * config.SPOTCHECK_TOLERANCE:.1f}%"
+    v["futures_carry"] = f"{100 * config.FUTURES_CARRY_ANNUAL:.0f}%"
+    slip = sorted(set(config.SLIPPAGE_BP_PER_SIDE.values()))
+    v["slippage_range"] = f"{slip[0]:g}–{slip[-1]:g}" if len(slip) > 1 else f"{slip[0]:g}"
+    v["reversed_jump"] = f"{100 * config.REVERSED_OPEN_MIN_JUMP:.0f}%"
+
     # Data -----------------------------------------------------------------
     series = r["series"]
     v["n_series"] = count(len(series))

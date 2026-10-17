@@ -55,3 +55,19 @@ def test_headline_numbers_match_their_reports(numbers) -> None:
 
 def test_every_number_is_a_non_empty_string(numbers) -> None:
     assert numbers and all(isinstance(x, str) and x for x in numbers.values())
+
+
+TEMPLATE = config.REPORTS / "findings.template.md"
+
+
+def test_the_template_uses_exactly_the_numbers_headline_provides(numbers) -> None:
+    findings.render(TEMPLATE.read_text(encoding="utf-8"), numbers)  # raises on any mismatch
+
+
+def test_committed_findings_are_up_to_date(numbers) -> None:
+    """Rerunning a phase without rerunning Phase 7 leaves findings.md stale: catch that."""
+    out = config.REPORTS / "findings.md"
+    if not out.exists():
+        pytest.skip("findings.md not generated yet")
+    expected = findings.render(TEMPLATE.read_text(encoding="utf-8"), numbers)
+    assert out.read_text(encoding="utf-8") == expected, "run `python -m scripts.phase7_findings`"

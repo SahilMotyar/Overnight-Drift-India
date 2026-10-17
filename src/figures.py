@@ -239,7 +239,7 @@ def edge_vs_cost(
                 at = cost
             else:
                 at = v
-            ax.annotate(f"{v:.1f}", (at, yi), xytext=(4, 0), textcoords="offset points",
+            ax.annotate(f"{v:.1f}".replace("-", "−"), (at, yi), xytext=(4, 0), textcoords="offset points",
                         ha="left", va="center", color=INK_2, fontsize=7.5)
         ax.annotate(f"cost {cost:.1f}", (cost, len(g) - 0.45), xytext=(4, 0), textcoords="offset points",
                     va="bottom", color=INK_2, fontsize=7.5, annotation_clip=False)
